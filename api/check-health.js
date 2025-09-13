@@ -24,6 +24,8 @@ Give a clear response with:
 4. Next steps for the patient.
 
 ⚠️ Reminder: This is not a substitute for professional medical advice. In emergencies, call local emergency services.
+
+At last, give the user medicine names and doses according to the user's symptoms.
 `;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -48,4 +50,5 @@ Give a clear response with:
     res.status(500).json({ error: "Something went wrong" });
   }
 }
+
 
