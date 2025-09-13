@@ -488,6 +488,8 @@ input[type="range"]::-moz-range-thumb {
 </section>
 
 
+
+
   <footer id="contact">
     <p>Contact us at <a href="mailto:info@homedoctor.ai">info@homedoctor.ai</a></p>
     <div class="credits">Made by Rizwan</div>
@@ -554,19 +556,31 @@ resultBox.appendChild(formatResponse(json.result));
     .replace(/(Urgency[:\s]*YELLOW|Triage[:\s]*YELLOW)/gi, '<span class="urgency yellow">$1</span>')
     .replace(/(Urgency[:\s]*GREEN|Triage[:\s]*GREEN)/gi, '<span class="urgency green">$1</span>');
 }
-
 function formatResponse(text) {
-  const lines = text.split(/\n+/).filter(l => l.trim());
+  const lines = text
+    .split(/\n+/)
+    .map(line => line.trim())
+    .filter(Boolean);
+
   const container = document.createElement("div");
 
   lines.forEach(line => {
-    const p = document.createElement("p");
-    p.innerHTML = highlightUrgency(line.trim());
-    container.appendChild(p);
+    // Remove leading Markdown symbols
+    let clean = line.replace(/^[-*#>\s]+/, "");
+
+    // Preserve ordered list if it starts with "1." or similar
+    const isNumbered = /^\d+\./.test(clean);
+    const tag = isNumbered ? "li" : "p";
+
+    const el = document.createElement(tag);
+    el.innerHTML = highlightUrgency(clean);
+
+    container.appendChild(el);
   });
 
   return container;
 }
+
 
   </script>
 </body>
