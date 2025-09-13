@@ -389,6 +389,24 @@ input[type="range"]::-moz-range-thumb {
   text-align: right;
 }
 
+.made-by-tag {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: #00000082;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  transition: background 0.3s;
+}
+.made-by-tag:hover {
+  background: #000000c8;
+  cursor: pointer;
+}
 
   </style>
 </head>
@@ -489,7 +507,7 @@ input[type="range"]::-moz-range-thumb {
 </section>
 
 
-
+  <div class="made-by-tag">Made By Developer Rizwan</div>
 
   <footer id="contact">
     <p>Contact us at <a href="mailto:info@homedoctor.ai">info@homedoctor.ai</a></p>
@@ -586,4 +604,3 @@ function formatResponse(text) {
   </script>
 </body>
 </html>
-
