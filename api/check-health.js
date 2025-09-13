@@ -48,3 +48,4 @@ Give a clear response with:
     res.status(500).json({ error: "Something went wrong" });
   }
 }
+
