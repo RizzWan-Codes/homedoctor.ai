@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auth - Homedoctor.ai</title>
+  <link rel="icon" href="hello.png">
+  <style>
+    body {
+      background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .auth-container {
+      width: 400px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .toggle-tabs {
+      display: flex;
+      position: relative;
+      background: #e8f7f4;
+      border-radius: 30px;
+      margin: 1rem auto;
+      width: 90%;
+      height: 45px;
+      cursor: pointer;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+      font-weight: bold;
+      color: #145c4f;
+      transition: color 0.3s;
+    }
+
+    .toggle-btn.active {
+      color: #fff;
+    }
+
+    .toggle-indicator {
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      width: 50%;
+      background: #1b9c85;
+      border-radius: 30px;
+      transition: transform 0.3s ease-in-out;
+      z-index: 1;
+    }
+
+    .auth-container.signup-active .toggle-indicator {
+      transform: translateX(100%);
+    }
+
+    .forms {
+      display: flex;
+      width: 200%;
+      transition: transform 0.5s ease;
+    }
+
+    .auth-container.signup-active .forms {
+      transform: translateX(-50%);
+    }
+
+    .form {
+      width: 50%;
+      padding: 2rem;
+      box-sizing: border-box;
+    }
+
+    .form h1 {
+      color: #145c4f;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .form-group { margin-bottom: 1.2rem; }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #cde7e2;
+      border-radius: 10px;
+      outline: none;
+    }
+    input:focus {
+      border-color: #1b9c85;
+      box-shadow: 0 0 6px rgba(27,156,133,0.4);
+    }
+
+    button {
+      width: 100%;
+      padding: 1rem;
+      background: #1b9c85;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    button:hover { background: #167b68; }
+  </style>
+</head>
+<body>
+<div id="authBox" class="auth-container">
+
+  <div class="toggle-tabs">
+    <div class="toggle-indicator"></div>
+    <div class="toggle-btn active" id="tabLogin">Login</div>
+    <div class="toggle-btn" id="tabSignup">Sign Up</div>
+  </div>
+
+  <div class="forms">
+    <div class="form">
+      <h1>Login</h1>
+      <div class="form-group">
+        <input type="email" id="loginEmail" placeholder="Email" />
+      </div>
+      <div class="form-group">
+        <input type="password" id="loginPassword" placeholder="Password" />
+      </div>
+      <button id="loginBtn">Login</button>
+    </div>
+
+    <div class="form">
+      <h1>Sign Up</h1>
+      <div class="form-group">
+        <input type="text" id="signupUsername" placeholder="Username" />
+      </div>
+      <div class="form-group">
+        <input type="email" id="signupEmail" placeholder="Email" />
+      </div>
+      <div class="form-group">
+        <input type="password" id="signupPassword" placeholder="Password" />
+      </div>
+      <button id="signupBtn">Sign Up</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const authBox = document.getElementById("authBox");
+  const tabLogin = document.getElementById("tabLogin");
+  const tabSignup = document.getElementById("tabSignup");
+
+  tabLogin.addEventListener("click", () => {
+    authBox.classList.remove("signup-active");
+    tabLogin.classList.add("active");
+    tabSignup.classList.remove("active");
+  });
+
+  tabSignup.addEventListener("click", () => {
+    authBox.classList.add("signup-active");
+    tabSignup.classList.add("active");
+    tabLogin.classList.remove("active");
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://iklnmtdeqorwvufewddr.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs";
+
+  const { createClient } = supabase;
+  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+    const username = document.getElementById("signupUsername").value;
+    const email = document.getElementById("signupEmail").value;
+    const password = document.getElementById("signupPassword").value;
+
+    if (!username || !email || !password) {
+      return alert("All fields are required!");
+    }
+
+    localStorage.setItem("pendingUsername", username);
+    alert("Signing up...");
+
+    const { data, error } = await db.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: "http://127.0.0.1:5500/Science%20Project/login.html"
+      }
+    });
+
+    if (error) {
+      alert("Error: " + error.message);
+      return;
+    }
+
+    alert("Signup successful! Check your email for verification.");
+  });
+
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    if (!email || !password) {
+      return alert("Please enter email and password.");
+    }
+
+    alert("Logging in...");
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert("Login failed: " + error.message);
+      return;
+    }
+
+    const user = data.user;
+    alert("Login successful! Welcome " + user.email);
+    window.location.href="dashboard.html";
+    
+
+    const username = localStorage.getItem("pendingUsername");
+    if (username) {
+      const { error: insertError } = await db.from("profiles").upsert([
+        {
+          id: user.id,
+          username,
+          created_at: new Date().toISOString()
+        }
+      ]);
+      if (insertError) {
+        console.error("Profile insert error:", insertError);
+      } else {
+        console.log("Profile created successfully!");
+        localStorage.removeItem("pendingUsername");
+      }
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Homedoctor.ai</title>
+  <link rel="icon" href="hello.png">
+  <style>
+    /* Reset & Base */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #f9fdfb;
+      color: #222;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+    header .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1b9c85;
+    }
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    nav a:hover { color: #1b9c85; }
+    .menu-toggle {
+      display: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      nav { display: none; flex-direction: column; background: white; position: absolute; top: 60px; right: 20px; padding: 1rem; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); border-radius: 10px; }
+      nav.active { display: flex; }
+      .menu-toggle { display: block; }
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 70vh;
+      background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 2rem 2rem;
+      text-align: center;
+    }
+    .hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #145c4f;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      color: #444;
+    }
+
+    /* Coins Section */
+    .coins {
+      padding: 3rem 2rem;
+      background: white;
+      text-align: center;
+    }
+    .coins h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #145c4f;
+    }
+    .coins p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+    .generate-btn {
+      padding: 1rem 2rem;
+      background: #1b9c85;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .generate-btn:hover { background: #167b68; }
+    .generate-btn:disabled { background: gray; cursor: not-allowed; }
+
+    /* Info Sections */
+    .section {
+      padding: 4rem 2rem;
+      background: #f9fdfb;
+      text-align: center;
+    }
+    .section h2 {
+      font-size: 2rem;
+      color: #145c4f;
+      margin-bottom: 1rem;
+    }
+    .section p {
+      max-width: 800px;
+      margin: 0 auto;
+      color: #444;
+      font-size: 1.1rem;
+    }
+
+    /* Footer */
+    footer {
+      padding: 2rem;
+      background: #145c4f;
+      color: white;
+      text-align: center;
+    }
+    footer a { color: #aef3e7; text-decoration: none; font-weight: 500; }
+    footer a:hover { text-decoration: underline; }
+    .credits { margin-top: 1rem; font-size: 0.9rem; color: #cfeee8; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">Homedoctor.ai</div>
+    <div class="menu-toggle" id="menu-toggle">☰</div>
+    <nav id="nav">
+      <a href="#coins">Coins</a>
+      <a href="#checker">Checker</a>
+      <a href="#about">About</a>
+      <a href="login.html" id="logoutBtn">Logout</a>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div>
+      <h1 id="welcomeText">Welcome!</h1>
+      <p>This is your personal Homedoctor.ai dashboard.</p>
+    </div>
+  </section>
+
+  <!-- Coins -->
+  <section class="coins" id="coins">
+    <h2>Your Coins</h2>
+    <p>You currently have <b id="coins-count">0</b> coins left.</p>
+    <button id="generateBtn" class="generate-btn">Generate Response</button>
+    <div id="output" style="margin-top:20px; font-weight:600; color:#145c4f;"></div>
+  </section>
+
+  <!-- Checker Info -->
+  <section class="section" id="checker">
+    <h2>AI Symptom Checker</h2>
+    <p>Enter your symptoms and get instant, AI-powered insights. Each response costs 20 coins.</p>
+  </section>
+
+  <!-- About -->
+  <section class="section" id="about">
+    <h2>About Homedoctor.ai</h2>
+    <p>Homedoctor.ai helps you manage your health with AI-driven insights. Coins let you access features fairly.</p>
+  </section>
+
+  <footer>
+    <p>Contact us at <a href="mailto:info@homedoctor.ai">info@homedoctor.ai</a></p>
+    <div class="credits">Made by Rizwan</div>
+  </footer>
+
+  <!-- Supabase Script -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://iklnmtdeqorwvufewddr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs";
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const toggle = document.getElementById("menu-toggle");
+    const nav = document.getElementById("nav");
+    toggle.addEventListener("click", () => nav.classList.toggle("active"));
+
+    const welcomeText = document.getElementById("welcomeText");
+    const coinsCount = document.getElementById("coins-count");
+    const generateBtn = document.getElementById("generateBtn");
+    const output = document.getElementById("output");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    async function init() {
+      // Get logged-in user
+      const { data: { user } } = await db.auth.getUser();
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Fetch or create profile
+      let { data: profile, error } = await db.from("profiles")
+        .select("username, coins")
+        .eq("id", user.id)
+        .single();
+
+      if (error && error.code === "PGRST116") {
+        // profile missing → create one
+        const username = localStorage.getItem("pendingUsername") || user.email.split("@")[0];
+        const { data: newProfile } = await db.from("profiles").insert([
+          { id: user.id, username, coins: 100 }  // default 100 coins
+        ]).select().single();
+        profile = newProfile;
+        localStorage.removeItem("pendingUsername");
+      }
+
+      welcomeText.innerText = `Welcome, ${profile.username}!`;
+      coinsCount.innerText = profile.coins;
+
+      if (profile.coins <= 0) generateBtn.disabled = true;
+
+      generateBtn.addEventListener("click", async () => {
+        if (profile.coins < 20) {
+          alert("Not enough coins!");
+          generateBtn.disabled = true;
+          return;
+        }
+
+        output.innerText = "AI Response: [example]";
+        profile.coins -= 20;
+        coinsCount.innerText = profile.coins;
+
+        await db.from("profiles").update({ coins: profile.coins }).eq("id", user.id);
+        if (profile.coins <= 0) generateBtn.disabled = true;
+      });
+    }
+    init();
+
+    // Logout
+    logoutBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      await db.auth.signOut();
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>
