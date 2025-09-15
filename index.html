@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Homedoctor.ai - Your AI Health Companion</title>
+  <link rel="icon" href="hello.png">
   <style>
     /* Reset */
 
@@ -408,6 +409,30 @@ input[type="range"]::-moz-range-thumb {
   cursor: pointer;
 }
 
+.login-btn{
+  background-color: #167b68;
+  border-color: #167b68;
+  border-style: solid;
+  border-radius: 15px;
+  padding: 3px;
+  height: 27px;
+  width: 110px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 5px;
+  animation: transition 0.5s ease;
+}
+
+.login-btn:hover{
+  background-color: #126253;
+  border-color: #126253;
+  border-style: solid;
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
   </style>
 </head>
 <body>
@@ -418,7 +443,8 @@ input[type="range"]::-moz-range-thumb {
       <a href="#features">Features</a>
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
-      <a href="#checker">Check Your Health</a>
+      <a href="#checker">See Your Health</a>
+      <button class="login-btn" onclick="window.open('login.html','_blank')"><b>Login / Sign Up</b></button>
     </nav>
   </header>
 
@@ -533,8 +559,16 @@ const severityMap = {
   3: "Severe"
 };
 
+const colorMap = {
+  1: "#5cb85c",    // Green for Mild
+  2: "#f0ad4e",    // Yellow for Moderate
+  3: "#d9534f"     // Red for Severe
+};
+
 severitySlider.addEventListener("input", () => {
-  severityLabel.textContent = severityMap[severitySlider.value];
+  const val = severitySlider.value;
+  severityLabel.textContent = severityMap[val];
+  severityLabel.style.color = colorMap[val];
 });
 
   const form = document.getElementById("symptomForm");
@@ -605,4 +639,3 @@ function formatResponse(text) {
   </script>
 </body>
 </html>
-
