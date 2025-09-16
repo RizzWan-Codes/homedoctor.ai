@@ -543,39 +543,54 @@ input[type="range"]::-moz-range-thumb {
 
 
 
-  <script>
-    const toggle = document.getElementById("menu-toggle");
-    const nav = document.getElementById("nav");
-    toggle.addEventListener("click", () => {
-      nav.classList.toggle("active");
-    });
+ <script>
+  const toggle = document.getElementById("menu-toggle");
+  const nav = document.getElementById("nav");
+  toggle.addEventListener("click", () => {
+    nav.classList.toggle("active");
+  });
 
-    const severitySlider = document.getElementById("severity");
-const severityLabel = document.getElementById("severity-label");
+  const severitySlider = document.getElementById("severity");
+  const severityLabel = document.getElementById("severity-label");
 
-const severityMap = {
-  1: "Mild",
-  2: "Moderate",
-  3: "Severe"
-};
+  const severityMap = {
+    1: "Mild",
+    2: "Moderate",
+    3: "Severe"
+  };
 
-const colorMap = {
-  1: "#5cb85c",    // Green for Mild
-  2: "#f0ad4e",    // Yellow for Moderate
-  3: "#d9534f"     // Red for Severe
-};
+  const colorMap = {
+    1: "#5cb85c",
+    2: "#f0ad4e",
+    3: "#d9534f"
+  };
 
-severitySlider.addEventListener("input", () => {
-  const val = severitySlider.value;
-  severityLabel.textContent = severityMap[val];
-  severityLabel.style.color = colorMap[val];
-});
+  severitySlider.addEventListener("input", () => {
+    const val = severitySlider.value;
+    severityLabel.textContent = severityMap[val];
+    severityLabel.style.color = colorMap[val];
+  });
 
   const form = document.getElementById("symptomForm");
   const resultBox = document.getElementById("result");
+  const submitBtn = document.querySelector(".submit-btn");
+
+  // 🔒 Check if trial already used
+  if (localStorage.getItem("trialUsed") === "true") {
+    submitBtn.disabled = true;
+    submitBtn.style.background = "#ccc";
+    submitBtn.style.cursor = "not-allowed";
+    resultBox.innerHTML = "⚠️ You have already used your free trial.";
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    // Stop if trial is already used
+    if (localStorage.getItem("trialUsed") === "true") {
+      resultBox.innerHTML = "⚠️ Trial already used. Please sign up for more.";
+      return;
+    }
 
     const data = {
       name: document.getElementById("name").value,
@@ -597,45 +612,43 @@ severitySlider.addEventListener("input", () => {
 
       const json = await res.json();
       resultBox.innerHTML = `<h3>AI Insights</h3>`;
-resultBox.appendChild(formatResponse(json.result));
+      resultBox.appendChild(formatResponse(json.result));
 
+      // ✅ After first success, lock trial permanently
+      localStorage.setItem("trialUsed", "true");
+      submitBtn.disabled = true;
+      submitBtn.style.background = "#ccc";
+      submitBtn.style.cursor = "not-allowed";
     } catch (err) {
       resultBox.innerHTML = "⚠️ Error: Could not fetch results.";
     }
   });
 
   function highlightUrgency(text) {
-  return text
-    .replace(/(Urgency[:\s]*RED|Triage[:\s]*RED)/gi, '<span class="urgency red">$1</span>')
-    .replace(/(Urgency[:\s]*YELLOW|Triage[:\s]*YELLOW)/gi, '<span class="urgency yellow">$1</span>')
-    .replace(/(Urgency[:\s]*GREEN|Triage[:\s]*GREEN)/gi, '<span class="urgency green">$1</span>');
-}
-function formatResponse(text) {
-  const lines = text
-    .split(/\n+/)
-    .map(line => line.trim())
-    .filter(Boolean);
+    return text
+      .replace(/(Urgency[:\s]*RED|Triage[:\s]*RED)/gi, '<span class="urgency red">$1</span>')
+      .replace(/(Urgency[:\s]*YELLOW|Triage[:\s]*YELLOW)/gi, '<span class="urgency yellow">$1</span>')
+      .replace(/(Urgency[:\s]*GREEN|Triage[:\s]*GREEN)/gi, '<span class="urgency green">$1</span>');
+  }
 
-  const container = document.createElement("div");
+  function formatResponse(text) {
+    const lines = text.split(/\n+/).map(line => line.trim()).filter(Boolean);
+    const container = document.createElement("div");
 
-  lines.forEach(line => {
-    // Remove leading Markdown symbols
-    let clean = line.replace(/^[-*#>\s]+/, "");
+    lines.forEach(line => {
+      let clean = line.replace(/^[-*#>\s]+/, "");
+      const isNumbered = /^\d+\./.test(clean);
+      const tag = isNumbered ? "li" : "p";
 
-    // Preserve ordered list if it starts with "1." or similar
-    const isNumbered = /^\d+\./.test(clean);
-    const tag = isNumbered ? "li" : "p";
+      const el = document.createElement(tag);
+      el.innerHTML = highlightUrgency(clean);
 
-    const el = document.createElement(tag);
-    el.innerHTML = highlightUrgency(clean);
+      container.appendChild(el);
+    });
 
-    container.appendChild(el);
-  });
+    return container;
+  }
+</script>
 
-  return container;
-}
-
-
-  </script>
 </body>
 </html>
