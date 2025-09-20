@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - Homedoctor.ai</title>
   <link rel="icon" href="hello.png">
   <style>
+    html{scroll-behavior: smooth;}
     /* === Keep all your original CSS === */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
     body { background: #f9fdfb; color: #222; line-height: 1.6; overflow-x: hidden; }
@@ -104,6 +106,10 @@
     footer a:hover { text-decoration: underline; }
     .credits { margin-top: 1rem; font-size: 0.9rem; color: #cfeee8; }
     .response-box { margin-top: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 12px; color: #145c4f; min-height: 50px; }
+  
+    #topup{
+      background-color: #d1e6e2;
+    }
   </style>
 </head>
 <body>
@@ -188,6 +194,19 @@
       all in one place.
     </p>
   </section>
+
+  <section class="section" id="topup">
+  <h2>Top-Up Coins</h2>
+  <p>Your Current Coins: <b id="coins-count-footer">--</b></p>
+
+  <div style="margin:1rem 0;">
+    <input type="number" id="coinInput" placeholder="Enter coins (20, 40, 60...)" min="20" step="20"
+           style="padding:0.8rem; border-radius:10px; border:1px solid #d1fae5; width:150px;">
+    <button id="buyCoinsBtn" class="generate-btn">Buy Coins</button>
+  </div>
+  <p style="font-size:0.9rem; color:#555;">Each coin costs ₹1. You can only buy in multiples of 20 coins.</p>
+</section>
+
 
   <footer>
     <p>Contact us at <a href="mailto:rizwanboss84@gmail.com">info@homedoctor.ai</a></p>
@@ -280,6 +299,80 @@
     });
 
     loadProfile();
+
+const buyCoinsBtn = document.getElementById("buyCoinsBtn");
+const coinInput = document.getElementById("coinInput");
+const coinsCountFooter = document.getElementById("coins-count-footer");
+
+function updateCoinsUI(coins) {
+  coinsCount.textContent = coins;
+  coinsCountFooter.textContent = coins;
+}
+
+buyCoinsBtn.addEventListener("click", async () => {
+  const coinsToBuy = parseInt(coinInput.value);
+  if (!coinsToBuy || coinsToBuy < 20 || coinsToBuy % 20 !== 0) {
+    alert("Enter coins in multiples of 20, minimum 20.");
+    return;
+  }
+
+  try {
+    // Step 1: Create Razorpay order
+    const orderRes = await fetch("/api/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ coins: coinsToBuy })
+    });
+    const orderData = await orderRes.json();
+    if (orderData.error) return alert(orderData.error);
+
+    // Step 2: Open Razorpay Checkout
+    const options = {
+      key: "RAZORPAY_KEY_ID", // <-- replace with your Razorpay Key ID
+      amount: orderData.order.amount,
+      currency: "INR",
+      name: "Homedoctor.ai",
+      description: `${coinsToBuy} Coins Top-Up`,
+      order_id: orderData.order.id,
+      handler: async function (response) {
+        try {
+          // Step 3: Verify payment & update coins in Supabase
+          const verifyRes = await fetch("/api/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              user_id: session.user.id,
+              coins: coinsToBuy
+            })
+          });
+
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            updateCoinsUI(verifyData.updatedCoins);
+            alert("Coins added successfully!");
+          } else {
+            alert("Payment verification failed: " + verifyData.error);
+          }
+        } catch (err) {
+          alert("Error verifying payment: " + err.message);
+        }
+      },
+      prefill: { email: session.user.email }, // optional
+      theme: { color: "#1b9c85" }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+});
+
+
   </script>
 </body>
 </html>
