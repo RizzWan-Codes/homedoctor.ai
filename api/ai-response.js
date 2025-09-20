@@ -56,25 +56,32 @@ Give a clear response in **bullet points**:
 Format as bullet points only.
 `;
 
-    // Call OpenAI
-    const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
+    let message = "No response from AI";
+    try {
+      const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt }],
+        }),
+      });
 
-    const aiData = await aiRes.json();
-    const message = aiData.choices?.[0]?.message?.content || "No response from AI";
+      // Always parse JSON safely
+      const aiData = await aiRes.json();
+      message = aiData.choices?.[0]?.message?.content || message;
+    } catch (openAIError) {
+      console.error("OpenAI fetch error:", openAIError);
+      message = "AI service error. Try again later.";
+    }
 
     res.status(200).json({ message, remainingCoins: profile.coins - 20 });
   } catch (err) {
     console.error(err);
+    // ALWAYS return JSON, never plain text
     res.status(500).json({ error: "Something went wrong" });
   }
 }
