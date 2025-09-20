@@ -125,6 +125,12 @@
       min-height: 50px;
     }
 
+    .generate-btn:disabled { 
+  background: gray; 
+  cursor: not-allowed; 
+}
+
+
   </style>
 </head>
 <body>
@@ -224,92 +230,128 @@
     <div class="credits">Made by Rizwan</div>
   </footer>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const supabaseUrl = "https://iklnmtdeqorwvufewddr.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs";
-    const supabase = createClient(supabaseUrl, supabaseKey);
+// Supabase setup
+const supabaseUrl = "https://iklnmtdeqorwvufewddr.supabase.co";
+const supabaseKey = "YOUR_SUPABASE_KEY_HERE"; // replace with your actual key
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const toggle = document.getElementById("menu-toggle");
-    const nav = document.getElementById("nav");
-    const generateBtn = document.getElementById("generateBtn");
-    const healthForm = document.getElementById("healthForm");
-    const severity = document.getElementById("severity");
-    const severityLabel = document.getElementById("severityLabel");
-    const coinsCount = document.getElementById("coins-count");
-    const welcomeText = document.getElementById("welcomeText");
-    const logoutLink = document.getElementById("logoutLink");
-    const symptomForm = document.getElementById("symptomForm");
-    const aiResponseBox = document.getElementById("ai-response");
+// DOM elements
+const toggle = document.getElementById("menu-toggle");
+const nav = document.getElementById("nav");
+const generateBtn = document.getElementById("generateBtn");
+const healthForm = document.getElementById("healthForm");
+const severity = document.getElementById("severity");
+const severityLabel = document.getElementById("severityLabel");
+const coinsCount = document.getElementById("coins-count");
+const welcomeText = document.getElementById("welcomeText");
+const logoutLink = document.getElementById("logoutLink");
+const symptomForm = document.getElementById("symptomForm");
+const aiResponseBox = document.getElementById("ai-response");
 
-    // Menu toggle
-    toggle.addEventListener("click", () => nav.classList.toggle("active"));
+let session;
 
-    // Severity slider
-    severity.addEventListener("input", () => {
-      const val = severity.value;
-      if(val==1){severityLabel.textContent="Mild";severityLabel.style.color="#22c55e";}
-      else if(val==2){severityLabel.textContent="Moderate";severityLabel.style.color="#eab308";}
-      else{severityLabel.textContent="Severe";severityLabel.style.color="#f97316";}
+// --- Menu toggle ---
+toggle.addEventListener("click", () => nav.classList.toggle("active"));
+
+// --- Severity slider ---
+severity.addEventListener("input", () => {
+  const val = severity.value;
+  if(val == 1) { severityLabel.textContent = "Mild"; severityLabel.style.color = "#22c55e"; }
+  else if(val == 2) { severityLabel.textContent = "Moderate"; severityLabel.style.color = "#eab308"; }
+  else { severityLabel.textContent = "Severe"; severityLabel.style.color = "#f97316"; }
+});
+
+// --- Show/hide form ---
+generateBtn.addEventListener("click", () => {
+  healthForm.style.display = healthForm.style.display === "block" ? "none" : "block";
+});
+
+// --- Load user profile ---
+async function loadProfile() {
+  const { data: { session: sess } } = await supabase.auth.getSession();
+  session = sess;
+
+  if (!session) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const user = session.user;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("username, coins")
+    .eq("id", user.id)
+    .single();
+
+  const username = profile?.username || user.email.split("@")[0];
+  const coins = profile?.coins ?? 0;
+
+  welcomeText.textContent = `Welcome, ${username}!`;
+  coinsCount.textContent = coins;
+
+  generateBtn.disabled = coins < 20;
+}
+
+// --- Logout ---
+logoutLink.addEventListener("click", async (e) => {
+  e.preventDefault();
+  await supabase.auth.signOut();
+  window.location.href = "login.html";
+});
+
+// --- Handle form submit ---
+symptomForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  let coins = parseInt(coinsCount.textContent);
+  if (coins < 20) { 
+    alert("Not enough coins!"); 
+    return; 
+  }
+
+  const name = document.getElementById("name").value;
+  const age = document.getElementById("age").value;
+  const gender = document.getElementById("gender").value;
+  const symptoms = document.getElementById("symptoms").value;
+  const details = document.getElementById("details").value;
+  const userId = session.user.id;
+
+  try {
+    const res = await fetch("/api/ai-response.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        age,
+        gender,
+        symptoms,
+        severity: severityLabel.textContent,
+        details,
+        userId
+      })
     });
 
-    // Show/hide form
-    generateBtn.addEventListener("click", () => {
-      healthForm.style.display = healthForm.style.display==="block"?"none":"block";
-    });
+    const data = await res.json();
 
-    // Load user + profile
-    async function loadProfile(){
-      const { data: { session } } = await supabase.auth.getSession();
-      if(!session){ window.location.href="login.html"; return; }
-      const user = session.user;
-      const { data: profile } = await supabase.from("profiles").select("username,coins").eq("id",user.id).single();
-      const username = profile?.username||user.email.split("@")[0];
-      const coins = profile?.coins ?? 0;
-      welcomeText.textContent = `Welcome, ${username}!`;
-      coinsCount.textContent = coins;
+    if (data.message) {
+      aiResponseBox.textContent = data.message;
+      coinsCount.textContent = data.remainingCoins;
+      generateBtn.disabled = data.remainingCoins < 20;
+    } else {
+      aiResponseBox.textContent = "Error: " + (data.error || "Something went wrong");
     }
 
-    // Logout
-    logoutLink.addEventListener("click", async(e)=>{
-      e.preventDefault();
-      await supabase.auth.signOut();
-      window.location.href="login.html";
-    });
+  } catch (err) {
+    aiResponseBox.textContent = "Error: " + err.message;
+  }
+});
 
-    // Handle form submit
-    symptomForm.addEventListener("submit", async(e)=>{
-      e.preventDefault();
-      let coins = parseInt(coinsCount.textContent);
-      if(coins<20){ alert("Not enough coins!"); return; }
+// --- Initialize ---
+loadProfile();
+</script>
 
-      const name = document.getElementById("name").value;
-      const age = document.getElementById("age").value;
-      const gender = document.getElementById("gender").value;
-      const symptoms = document.getElementById("symptoms").value;
-      const details = document.getElementById("details").value;
-
-      try{
-        const res = await fetch("/api/ai-response.js",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({name, age, gender, symptoms, severity:severityLabel.textContent, details})
-        });
-        const data = await res.json();
-        if(data.message){
-          coins -= 20;
-          coinsCount.textContent = coins;
-          aiResponseBox.textContent = data.message;
-        } else aiResponseBox.textContent = "Error: "+(data.error||"Something went wrong");
-      } catch(err){
-        aiResponseBox.textContent = "Error: "+err.message;
-      }
-
-      loadProfile();
-    });
-
-    loadProfile();
-  </script>
 </body>
 </html>
