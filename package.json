@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered health dashboard backend",
   "main": "script.js",
   "type": "module",
@@ -8,7 +8,7 @@
     "start": "node script.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["ai", "health", "dashboard", "supabase", "openai"],
+  "keywords": ["ai", "health", "dashboard", "supabase", "openai", "razorpay"],
   "author": "Rizwan",
   "license": "ISC",
   "dependencies": {
@@ -16,7 +16,8 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
-    "openai": "^5.20.0"
+    "openai": "^5.20.0",
+    "razorpay": "^2.8.0"
   },
   "devDependencies": {}
 }
