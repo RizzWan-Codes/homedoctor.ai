@@ -6,11 +6,10 @@
   <title>Dashboard - Homedoctor.ai</title>
   <link rel="icon" href="hello.png">
   <style>
-    /* Reset & Base */
+    /* === Keep all your original CSS === */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
     body { background: #f9fdfb; color: #222; line-height: 1.6; overflow-x: hidden; }
 
-    /* Header */
     header {
       position: fixed; top: 0; left: 0; width: 100%;
       padding: 1rem 2rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
@@ -28,7 +27,6 @@
       .menu-toggle { display: block; }
     }
 
-    /* Hero */
     .hero {
       min-height: 60vh;
       background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
@@ -38,7 +36,6 @@
     .hero h1 { font-size: 2.5rem; font-weight: 800; color: #145c4f; margin-bottom: 1rem; }
     .hero p { font-size: 1.2rem; max-width: 650px; margin: 0 auto; color: #444; }
 
-    /* Coins Section */
     .coins { padding: 4rem 2rem; background: white; text-align: center; }
     .coins h2 { font-size: 2rem; margin-bottom: 1rem; color: #145c4f; }
     .coins p { font-size: 1.1rem; margin-bottom: 2rem; }
@@ -49,7 +46,6 @@
     .generate-btn:hover { background: #167b68; }
     .generate-btn:disabled { background: gray; cursor: not-allowed; }
 
-    /* Hidden Form */
     .form-container {
       max-width: 700px; margin: 2rem auto 0; padding: 2rem; border-radius: 15px;
       background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
@@ -71,7 +67,6 @@
     }
     .submit-btn:hover { background: #167b68; }
 
-    /* Severity Slider */
     .slider {
       width: 100%;
       height: 10px;
@@ -100,37 +95,15 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-    .severity-labels {
-      display: flex; justify-content: space-between;
-      font-size: 0.9rem; margin-top: 8px;
-    }
-
-    /* Info Sections */
+    .severity-labels { display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 8px; }
     .section { padding: 5rem 2rem; background: #f9fdfb; text-align: center; }
     .section h2 { font-size: 2rem; color: #145c4f; margin-bottom: 1rem; }
     .section p { max-width: 750px; margin: 0 auto; color: #444; font-size: 1.1rem; }
-
-    /* Footer */
     footer { padding: 2rem; background: #145c4f; color: white; text-align: center; }
     footer a { color: #aef3e7; text-decoration: none; font-weight: 500; }
     footer a:hover { text-decoration: underline; }
     .credits { margin-top: 1rem; font-size: 0.9rem; color: #cfeee8; }
-
-    .response-box {
-      margin-top: 1rem;
-      padding: 1rem;
-      background: #f0fdf4;
-      border-radius: 12px;
-      color: #145c4f;
-      min-height: 50px;
-    }
-
-    .generate-btn:disabled { 
-  background: gray; 
-  cursor: not-allowed; 
-}
-
-
+    .response-box { margin-top: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 12px; color: #145c4f; min-height: 50px; }
   </style>
 </head>
 <body>
@@ -145,7 +118,6 @@
     </nav>
   </header>
 
-  <!-- Hero -->
   <section class="hero">
     <div>
       <h1 id="welcomeText">Welcome!</h1>
@@ -153,13 +125,11 @@
     </div>
   </section>
 
-  <!-- Coins -->
   <section class="coins" id="coins">
     <h2>Your Coins</h2>
     <p>You currently have <b id="coins-count">--</b> coins left.</p>
     <button id="generateBtn" class="generate-btn">Generate Response</button>
 
-    <!-- Hidden Form -->
     <div class="form-container" id="healthForm">
       <form id="symptomForm">
         <div class="form-group">
@@ -185,8 +155,6 @@
           <label>Symptoms</label>
           <textarea id="symptoms" placeholder="Describe your symptoms..." required></textarea>
         </div>
-
-        <!-- Severity Bar -->
         <div class="form-group">
           <label>Select Severity</label>
           <input type="range" min="1" max="3" value="1" id="severity" class="slider">
@@ -197,25 +165,21 @@
           </div>
           <p id="severityLabel" style="text-align:center; font-weight:bold; margin-top:10px; color:#22c55e;">Mild</p>
         </div>
-
         <div class="form-group">
           <label>Additional Details</label>
           <textarea id="details" placeholder="Any extra details about your health..."></textarea>
         </div>
         <button type="submit" class="submit-btn">Check My Health</button>
       </form>
-
       <div class="response-box" id="ai-response">Your AI Insights Will Appear Here...</div>
     </div>
   </section>
 
-  <!-- Checker Info -->
   <section class="section" id="checker">
     <h2>AI Symptom Checker</h2>
     <p>Describe your symptoms and get AI-powered insights in seconds. Each response costs 20 coins.</p>
   </section>
 
-  <!-- About -->
   <section class="section" id="about">
     <h2>About Homedoctor.ai</h2>
     <p>
@@ -230,130 +194,92 @@
     <div class="credits">Made by Rizwan</div>
   </footer>
 
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Supabase setup
-const supabaseUrl = "https://iklnmtdeqorwvufewddr.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs"; // replace with your actual key
-const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseUrl = "https://iklnmtdeqorwvufewddr.supabase.co";
+    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs"; // replace with Service Role key
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-// DOM elements
-const toggle = document.getElementById("menu-toggle");
-const nav = document.getElementById("nav");
-const generateBtn = document.getElementById("generateBtn");
-const healthForm = document.getElementById("healthForm");
-const severity = document.getElementById("severity");
-const severityLabel = document.getElementById("severityLabel");
-const coinsCount = document.getElementById("coins-count");
-const welcomeText = document.getElementById("welcomeText");
-const logoutLink = document.getElementById("logoutLink");
-const symptomForm = document.getElementById("symptomForm");
-const aiResponseBox = document.getElementById("ai-response");
+    const toggle = document.getElementById("menu-toggle");
+    const nav = document.getElementById("nav");
+    const generateBtn = document.getElementById("generateBtn");
+    const healthForm = document.getElementById("healthForm");
+    const severity = document.getElementById("severity");
+    const severityLabel = document.getElementById("severityLabel");
+    const coinsCount = document.getElementById("coins-count");
+    const welcomeText = document.getElementById("welcomeText");
+    const logoutLink = document.getElementById("logoutLink");
+    const symptomForm = document.getElementById("symptomForm");
+    const aiResponseBox = document.getElementById("ai-response");
+    let session;
 
-let session;
+    toggle.addEventListener("click", () => nav.classList.toggle("active"));
 
-// --- Menu toggle ---
-toggle.addEventListener("click", () => nav.classList.toggle("active"));
-
-// --- Severity slider ---
-severity.addEventListener("input", () => {
-  const val = severity.value;
-  if(val == 1) { severityLabel.textContent = "Mild"; severityLabel.style.color = "#22c55e"; }
-  else if(val == 2) { severityLabel.textContent = "Moderate"; severityLabel.style.color = "#eab308"; }
-  else { severityLabel.textContent = "Severe"; severityLabel.style.color = "#f97316"; }
-});
-
-// --- Show/hide form ---
-generateBtn.addEventListener("click", () => {
-  healthForm.style.display = healthForm.style.display === "block" ? "none" : "block";
-});
-
-// --- Load user profile ---
-async function loadProfile() {
-  const { data: { session: sess } } = await supabase.auth.getSession();
-  session = sess;
-
-  if (!session) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  const user = session.user;
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username, coins")
-    .eq("id", user.id)
-    .single();
-
-  const username = profile?.username || user.email.split("@")[0];
-  const coins = profile?.coins ?? 0;
-
-  welcomeText.textContent = `Welcome, ${username}!`;
-  coinsCount.textContent = coins;
-
-  generateBtn.disabled = coins < 20;
-}
-
-// --- Logout ---
-logoutLink.addEventListener("click", async (e) => {
-  e.preventDefault();
-  await supabase.auth.signOut();
-  window.location.href = "login.html";
-});
-
-// --- Handle form submit ---
-symptomForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  let coins = parseInt(coinsCount.textContent);
-  if (coins < 20) { 
-    alert("Not enough coins!"); 
-    return; 
-  }
-
-  const name = document.getElementById("name").value;
-  const age = document.getElementById("age").value;
-  const gender = document.getElementById("gender").value;
-  const symptoms = document.getElementById("symptoms").value;
-  const details = document.getElementById("details").value;
-  const userId = session.user.id;
-
-  try {
-    const res = await fetch("/api/ai-response", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        age,
-        gender,
-        symptoms,
-        severity: severityLabel.textContent,
-        details,
-        userId
-      })
+    severity.addEventListener("input", () => {
+      const val = severity.value;
+      if(val==1){severityLabel.textContent="Mild";severityLabel.style.color="#22c55e";}
+      else if(val==2){severityLabel.textContent="Moderate";severityLabel.style.color="#eab308";}
+      else{severityLabel.textContent="Severe";severityLabel.style.color="#f97316";}
     });
 
-    const data = await res.json();
+    generateBtn.addEventListener("click", () => {
+      healthForm.style.display = healthForm.style.display==="block"?"none":"block";
+    });
 
-    if (data.message) {
-      aiResponseBox.textContent = data.message;
-      coinsCount.textContent = data.remainingCoins;
-      generateBtn.disabled = data.remainingCoins < 20;
-    } else {
-      aiResponseBox.textContent = "Error: " + (data.error || "Something went wrong");
+    async function loadProfile(){
+      const { data } = await supabase.auth.getSession();
+      session = data.session;
+      if(!session){ window.location.href="login.html"; return; }
+      const user = session.user;
+      const { data: profile } = await supabase.from("profiles").select("username,coins").eq("id",user.id).single();
+      const username = profile?.username||user.email.split("@")[0];
+      const coins = profile?.coins ?? 0;
+      welcomeText.textContent = `Welcome, ${username}!`;
+      coinsCount.textContent = coins;
+      generateBtn.disabled = coins < 20;
     }
 
-  } catch (err) {
-    aiResponseBox.textContent = "Error: " + err.message;
-  }
-});
+    logoutLink.addEventListener("click", async(e)=>{
+      e.preventDefault();
+      await supabase.auth.signOut();
+      window.location.href="login.html";
+    });
 
-// --- Initialize ---
-loadProfile();
-</script>
+    symptomForm.addEventListener("submit", async(e)=>{
+      e.preventDefault();
+      let coins = parseInt(coinsCount.textContent);
+      if(coins<20){ alert("Not enough coins!"); return; }
 
+      const name = document.getElementById("name").value;
+      const age = document.getElementById("age").value;
+      const gender = document.getElementById("gender").value;
+      const symptoms = document.getElementById("symptoms").value;
+      const details = document.getElementById("details").value;
+      const userId = session.user.id;
+
+      try{
+        const res = await fetch("/api/ai-response.js",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({ name, age, gender, symptoms, severity:severityLabel.textContent, details, userId })
+        });
+        const data = await res.json();
+        if(data.message){
+          aiResponseBox.textContent = data.message;
+          coinsCount.textContent = data.remainingCoins;
+          generateBtn.disabled = data.remainingCoins < 20;
+        } else {
+          aiResponseBox.textContent = "Error: "+(data.error||"Something went wrong");
+        }
+      } catch(err){
+        aiResponseBox.textContent = "Error: "+err.message;
+      }
+
+      loadProfile();
+    });
+
+    loadProfile();
+  </script>
 </body>
 </html>
-
-
