@@ -1,13 +1,41 @@
 // api/ai-response.js
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // use service role for secure write
+const supabase = createClient(supabaseUrl, supabaseKey);
+
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  if (req.method !== "POST") 
     return res.status(405).json({ error: "Method not allowed" });
-  }
 
   try {
-    // Match the dashboard fields
-    const { name, age, gender, symptoms, severity, details } = req.body;
+    const { name, age, gender, symptoms, severity, details, userId } = req.body;
 
+    // Fetch user coins from DB
+    const { data: profile, error: fetchError } = await supabase
+      .from("profiles")
+      .select("coins")
+      .eq("id", userId)
+      .single();
+
+    if (fetchError || !profile) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    if (profile.coins < 20) {
+      return res.status(400).json({ error: "Not enough coins" });
+    }
+
+    // Deduct 20 coins
+    const { error: updateError } = await supabase
+      .from("profiles")
+      .update({ coins: profile.coins - 20 })
+      .eq("id", userId);
+
+    if (updateError) throw updateError;
+
+    // Build AI prompt
     const prompt = `
 You are an AI health assistant. 
 Patient details:
@@ -18,16 +46,18 @@ Patient details:
 - Severity: ${severity}
 - Additional Info: ${details}
 
-Give a clear response with:
-1. Likely conditions (top 2–3 possibilities).
-2. Differential uncertainty (how unsure you are).
-3. Urgency triage: GREEN (self-care), YELLOW (see GP soon), RED (urgent/emergency).
-4. Next steps for the patient.
+Give a clear response in **bullet points**:
+1. Likely conditions (top 2–3)
+2. Differential uncertainty
+3. Urgency triage: GREEN, YELLOW, RED
+4. Next steps
 
-⚠️ Reminder: This is not a substitute for professional medical advice. In emergencies, call local emergency services.
+⚠️ Reminder: This is not a substitute for professional medical advice.
+Format as bullet points only.
 `;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    // Call OpenAI
+    const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,15 +69,12 @@ Give a clear response with:
       }),
     });
 
-    const data = await response.json();
+    const aiData = await aiRes.json();
+    const message = aiData.choices?.[0]?.message?.content || "No response from AI";
 
-    res.status(200).json({
-      message: data.choices?.[0]?.message?.content || "No response from AI",
-    });
-  } catch (error) {
-    console.error(error);
+    res.status(200).json({ message, remainingCoins: profile.coins - 20 });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Something went wrong" });
   }
 }
-
-
