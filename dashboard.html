@@ -115,6 +115,16 @@
     footer a { color: #aef3e7; text-decoration: none; font-weight: 500; }
     footer a:hover { text-decoration: underline; }
     .credits { margin-top: 1rem; font-size: 0.9rem; color: #cfeee8; }
+
+    .response-box {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f0fdf4;
+      border-radius: 12px;
+      color: #145c4f;
+      min-height: 50px;
+    }
+
   </style>
 </head>
 <body>
@@ -188,6 +198,8 @@
         </div>
         <button type="submit" class="submit-btn">Check My Health</button>
       </form>
+
+      <div class="response-box" id="ai-response">Your AI Insights Will Appear Here...</div>
     </div>
   </section>
 
@@ -212,7 +224,6 @@
     <div class="credits">Made by Rizwan</div>
   </footer>
 
-  <!-- Main Script -->
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -230,104 +241,74 @@
     const welcomeText = document.getElementById("welcomeText");
     const logoutLink = document.getElementById("logoutLink");
     const symptomForm = document.getElementById("symptomForm");
+    const aiResponseBox = document.getElementById("ai-response");
 
     // Menu toggle
     toggle.addEventListener("click", () => nav.classList.toggle("active"));
 
     // Severity slider
     severity.addEventListener("input", () => {
-      if (severity.value == 1) {
-        severityLabel.textContent = "Mild";
-        severityLabel.style.color = "#22c55e";
-      } else if (severity.value == 2) {
-        severityLabel.textContent = "Moderate";
-        severityLabel.style.color = "#eab308";
-      } else {
-        severityLabel.textContent = "Severe";
-        severityLabel.style.color = "#f97316";
-      }
+      const val = severity.value;
+      if(val==1){severityLabel.textContent="Mild";severityLabel.style.color="#22c55e";}
+      else if(val==2){severityLabel.textContent="Moderate";severityLabel.style.color="#eab308";}
+      else{severityLabel.textContent="Severe";severityLabel.style.color="#f97316";}
     });
 
     // Show/hide form
     generateBtn.addEventListener("click", () => {
-      healthForm.style.display = healthForm.style.display === "block" ? "none" : "block";
+      healthForm.style.display = healthForm.style.display==="block"?"none":"block";
     });
 
     // Load user + profile
-    async function loadProfile() {
+    async function loadProfile(){
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        window.location.href = "login.html";
-        return;
-      }
+      if(!session){ window.location.href="login.html"; return; }
       const user = session.user;
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("username, coins")
-        .eq("id", user.id)
-        .single();
-
-      const username = profile?.username || user.email.split("@")[0];
+      const { data: profile } = await supabase.from("profiles").select("username,coins").eq("id",user.id).single();
+      const username = profile?.username||user.email.split("@")[0];
       const coins = profile?.coins ?? 0;
-
       welcomeText.textContent = `Welcome, ${username}!`;
       coinsCount.textContent = coins;
     }
 
     // Logout
-    logoutLink.addEventListener("click", async (e) => {
+    logoutLink.addEventListener("click", async(e)=>{
       e.preventDefault();
       await supabase.auth.signOut();
-      window.location.href = "login.html";
+      window.location.href="login.html";
     });
 
     // Handle form submit
-  document.querySelector(".submit-btn").addEventListener("click", async () => {
-  let coins = parseInt(coinsCount.textContent);
-  if (coins < 20) {
-    alert("Not enough coins!");
-    return;
-  }
+    symptomForm.addEventListener("submit", async(e)=>{
+      e.preventDefault();
+      let coins = parseInt(coinsCount.textContent);
+      if(coins<20){ alert("Not enough coins!"); return; }
 
-  const name = document.querySelector("input[placeholder='Your name']").value;
-  const age = document.querySelector("input[type='number']").value;
-  const gender = document.querySelector("select").value;
-  const symptoms = document.querySelector("textarea[placeholder='Describe your symptoms...']").value;
-  const details = document.querySelector("textarea[placeholder='Any extra details about your health...']").value;
+      const name = document.getElementById("name").value;
+      const age = document.getElementById("age").value;
+      const gender = document.getElementById("gender").value;
+      const symptoms = document.getElementById("symptoms").value;
+      const details = document.getElementById("details").value;
 
-  try {
-    const res = await fetch("/api/check-health.js", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        age,
-        gender,
-        symptoms,
-        severity: severityLabel.textContent,
-        details
-      })
+      try{
+        const res = await fetch("/api/ai-response.js",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({name, age, gender, symptoms, severity:severityLabel.textContent, details})
+        });
+        const data = await res.json();
+        if(data.message){
+          coins -= 20;
+          coinsCount.textContent = coins;
+          aiResponseBox.textContent = data.message;
+        } else aiResponseBox.textContent = "Error: "+(data.error||"Something went wrong");
+      } catch(err){
+        aiResponseBox.textContent = "Error: "+err.message;
+      }
+
+      loadProfile();
     });
 
-    const data = await res.json();
-
-    if (data.message) {
-      // Deduct coins only if response succeeds
-      coins -= 20;
-      coinsCount.textContent = coins;
-
-      alert("AI Response:\n\n" + data.message);
-    } else {
-      alert("Error: " + (data.error || "Something went wrong"));
-    }
-  } catch (err) {
-    alert("Failed to connect to AI server.");
-    console.error(err);
-  }
-});
-
-    // Init
     loadProfile();
   </script>
 </body>
