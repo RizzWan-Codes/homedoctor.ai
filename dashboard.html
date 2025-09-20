@@ -320,7 +320,7 @@ symptomForm.addEventListener("submit", async (e) => {
   const userId = session.user.id;
 
   try {
-    const res = await fetch("/api/ai-response.js", {
+    const res = await fetch("/api/ai-response", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -355,4 +355,5 @@ loadProfile();
 
 </body>
 </html>
+
 
