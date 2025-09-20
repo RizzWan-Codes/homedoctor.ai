@@ -53,7 +53,7 @@ export default async function handler(req, res) {
     }
 
     // Build AI prompt
-    const prompt = `
+   const prompt = `
 You are an AI health assistant.
 Patient details:
 - Name: ${name}
@@ -63,15 +63,15 @@ Patient details:
 - Severity: ${severity}
 - Additional Info: ${details}
 
-Give a clear response in bullet points:
+Give a clear response and always in bullet points and in a neat way:
 1. Likely conditions (top 2–3)
 2. Differential uncertainty
 3. Urgency triage: GREEN, YELLOW, RED
 4. Next steps
 
-Reminder: This is not professional medical advice.
-Format as bullet points only.
+⚠️ This is NOT a substitute for professional medical advice.
 `;
+
 
     // Call OpenAI safely
     let message = "No response from AI";
@@ -111,3 +111,4 @@ Format as bullet points only.
     return res.status(500).json({ error: "Server error occurred", details: err.message });
   }
 }
+
