@@ -69,6 +69,8 @@ Give a clear response and always in bullet points and in a neat way:
 3. Urgency triage: GREEN, YELLOW, RED
 4. Next steps
 
+At the very last, suggest the user 3 medicines which are most suitable according to their symptoms.
+
 ⚠️ This is NOT a substitute for professional medical advice.
 `;
 
@@ -111,4 +113,5 @@ Give a clear response and always in bullet points and in a neat way:
     return res.status(500).json({ error: "Server error occurred", details: err.message });
   }
 }
+
 
