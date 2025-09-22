@@ -25,7 +25,7 @@ Give a clear response with:
 
 ⚠️ Reminder: This is not a substitute for professional medical advice. In emergencies, call local emergency services.
 
-At last, give the user medicine names and doses according to the user's symptoms.
+At the very last, suggest the user 3 medicines and their doses which are most suitable according to their symptoms.
 `;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -50,5 +50,6 @@ At last, give the user medicine names and doses according to the user's symptoms
     res.status(500).json({ error: "Something went wrong" });
   }
 }
+
 
 
