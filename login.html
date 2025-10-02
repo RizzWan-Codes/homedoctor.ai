@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Auth - Homedoctor.ai</title>
   <link rel="icon" href="hello.png">
   <style>
@@ -112,9 +112,48 @@
       margin-top: 0.5rem;
     }
     button:hover { background: #167b68; }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 1rem 0;
+    }
+    .divider div {
+      flex: 1;
+      height: 1px;
+      background: #ccc;
+    }
+    .divider span {
+      margin: 0 10px;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .google-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: white;
+      color: #444;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 0.8rem;
+      width: 100%;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .google-btn:hover {
+      background: #f5f5f5;
+    }
+    .google-btn img {
+      width: 20px;
+      height: 20px;
+    }
   </style>
 </head>
 <body>
+
 <div id="authBox" class="auth-container">
 
   <div class="toggle-tabs">
@@ -124,6 +163,7 @@
   </div>
 
   <div class="forms">
+    <!-- LOGIN FORM -->
     <div class="form">
       <h1>Login</h1>
       <div class="form-group">
@@ -133,8 +173,19 @@
         <input type="password" id="loginPassword" placeholder="Password" />
       </div>
       <button id="loginBtn">Login</button>
+
+      <div class="divider">
+        <div></div>
+        <span>or</span>
+        <div></div>
+      </div>
+      <button id="googleLoginBtn" class="google-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+        Continue with Google
+      </button>
     </div>
 
+    <!-- SIGNUP FORM -->
     <div class="form">
       <h1>Sign Up</h1>
       <div class="form-group">
@@ -147,11 +198,22 @@
         <input type="password" id="signupPassword" placeholder="Password" />
       </div>
       <button id="signupBtn">Sign Up</button>
+
+      <div class="divider">
+        <div></div>
+        <span>or</span>
+        <div></div>
+      </div>
+      <button id="googleSignupBtn" class="google-btn">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+        Sign up with Google
+      </button>
     </div>
   </div>
 </div>
 
 <script>
+  // Toggle between Login & Sign Up
   const authBox = document.getElementById("authBox");
   const tabLogin = document.getElementById("tabLogin");
   const tabSignup = document.getElementById("tabSignup");
@@ -177,6 +239,7 @@
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // Email/Password SIGN UP
   document.getElementById("signupBtn").addEventListener("click", async () => {
     const username = document.getElementById("signupUsername").value;
     const email = document.getElementById("signupEmail").value;
@@ -205,6 +268,7 @@
     alert("Signup successful! Check your email for verification.");
   });
 
+  // Email/Password LOGIN
   document.getElementById("loginBtn").addEventListener("click", async () => {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
@@ -214,7 +278,6 @@
     }
 
     alert("Logging in...");
-
     const { data, error } = await db.auth.signInWithPassword({ email, password });
     if (error) {
       alert("Login failed: " + error.message);
@@ -223,17 +286,12 @@
 
     const user = data.user;
     alert("Login successful! Welcome " + user.email);
-    window.location.href="dashboard.html";
-    
+    window.location.href = "dashboard.html";
 
     const username = localStorage.getItem("pendingUsername");
     if (username) {
       const { error: insertError } = await db.from("profiles").upsert([
-        {
-          id: user.id,
-          username,
-          created_at: new Date().toISOString()
-        }
+        { id: user.id, username, created_at: new Date().toISOString() }
       ]);
       if (insertError) {
         console.error("Profile insert error:", insertError);
@@ -243,7 +301,21 @@
       }
     }
   });
-</script>
-</body>
 
+  // GOOGLE Sign-In / Sign-Up (Supabase OAuth)
+  async function signInWithGoogle() {
+    const { error } = await db.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: "https://homedoctor-ai-iota.vercel.app/dashboard.html"
+      }
+    });
+    if (error) alert("Google sign-in error: " + error.message);
+  }
+
+  document.getElementById("googleLoginBtn").addEventListener("click", signInWithGoogle);
+  document.getElementById("googleSignupBtn").addEventListener("click", signInWithGoogle);
+</script>
+
+</body>
 </html>
