@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   "https://iklnmtdeqorwvufewddr.supabase.co",
-  process.env.SUPABASE_SERVICE_KEY // make sure this is set in Vercel env vars
+  process.env.SUPABASE_SERVICE_KEY
 );
 
 const openai = new OpenAI({
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const { userId } = req.body;
     if (!userId) return res.status(400).json({ error: "Missing userId" });
 
-    // 📝 Fetch health logs
+    // 📝 Fetch logs from Supabase
     const { data: logs, error } = await supabase
       .from("health_logs")
       .select("severity, created_at, symptoms")
@@ -32,53 +32,43 @@ export default async function handler(req, res) {
       return res.status(200).json({ message: "No health data yet." });
     }
 
-    // 🧠 Prepare data for AI
-    const severityMap = { Mild: 1, Moderate: 2, Severe: 3 };
-    const severities = logs.map(l => severityMap[l.severity] || 1);
-    const avg = severities.reduce((a,b)=>a+b,0) / severities.length;
-    const mid = Math.floor(severities.length / 2);
-    const earlyAvg = severities.slice(0, mid).reduce((a,b)=>a+b,0) / Math.max(mid,1);
-    const recentAvg = severities.slice(mid).reduce((a,b)=>a+b,0) / Math.max(severities.length - mid, 1);
+    // Format logs
+    const formattedLogs = logs
+      .map(
+        (l) =>
+          `• Date: ${new Date(l.created_at).toLocaleDateString()} | Severity: ${
+            l.severity
+          } | Symptoms: ${l.symptoms}`
+      )
+      .join("\n");
 
-    let trendStatus = "";
-    if (recentAvg < earlyAvg - 0.3) trendStatus = "improving";
-    else if (recentAvg > earlyAvg + 0.3) trendStatus = "worsening";
-    else trendStatus = "stable";
-
-    const symptomsList = logs.map(l => l.symptoms).join("; ");
-
-    // 🧠 Prompt for OpenAI
+    // Prompt similar to AI insights, but focused on *trend, diet, exercise*
     const prompt = `
-You are a world-class health assistant with 3 personas: Nutritionist 🥦, Personal Chef 👨‍🍳, and Fitness Trainer 🏋️.  
-The user’s health severity trend is: ${trendStatus} (early avg: ${earlyAvg.toFixed(1)}, recent avg: ${recentAvg.toFixed(1)}).  
-Average severity: ${avg.toFixed(1)} out of 3 (1=Mild, 3=Severe).
+    You are a professional digital health assistant. Analyze the following health logs and provide:
 
-Their recent symptoms: ${symptomsList}.
+    - 🩺 A short **trend analysis** (is the user's health improving, worsening, or stable? Explain in 2–3 lines)
+    - 🥦 **Diet recommendations** (suggest key nutrition goals based on the trend)
+    - 🧍‍♂️ **Exercise recommendations** tailored to their current trend
+    - 💡 3–5 **personalized health tips**
 
-Based on this:
-1. Give a **short trend summary** (improving/worsening/stable).
-2. Give **nutrition goals** (protein grams, carbs level, fats level, dietary restrictions).
-3. Give a **diet plan** for a day (Breakfast, Lunch, Dinner, Snacks).
-4. Provide **2 actual recipes** with ingredients, steps, and macro breakdown that match the goals.
-5. Create an **exercise plan** suitable for their severity trend.
-6. Give 3-5 **health tips** for improvement.
+    Keep the tone friendly and motivating. Do not output JSON. Just write it clearly like a short report.
 
-Return the result in a clean JSON format with keys: 
-trendSummary, nutritionGoals, dietPlan, recipes, exercisePlan, tips.
+    Logs:
+    ${formattedLogs}
     `;
 
-    // 🤖 Ask OpenAI
+    // Ask OpenAI
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
-      response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: "You are an expert health assistant." },
+        { role: "system", content: "You are a helpful health trend analyzer." },
         { role: "user", content: prompt }
-      ]
+      ],
+      max_tokens: 400,
     });
 
-    const parsed = JSON.parse(completion.choices[0].message.content);
-    return res.status(200).json(parsed);
+    const message = completion.choices[0].message.content;
+    return res.status(200).json({ trend: message });
 
   } catch (err) {
     console.error("health-trend.js error:", err);
