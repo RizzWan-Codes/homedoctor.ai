@@ -549,16 +549,24 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
     return;
   }
 
-  analyticsBox.textContent = "Analyzing your health trend with AI... 🧠📈";
+  analyticsBox.textContent = "Analyzing your health trend with AI... 🧠💪";
 
   try {
     const res = await fetch("/api/health-trend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: session.user.id }),
+      body: JSON.stringify({ userId: session.user.id })
     });
 
-    const data = await res.json();
+    // 👇 handle non-JSON response safely
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      throw new Error("Invalid JSON returned: " + text);
+    }
+
     if (data.error) throw new Error(data.error);
     if (data.message) {
       analyticsBox.textContent = data.message;
@@ -566,6 +574,7 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
     }
 
     analyticsBox.textContent = data.trend;
+
   } catch (err) {
     console.error("Trend fetch error:", err);
     analyticsBox.textContent = "Failed to analyze health trend 😔";
@@ -648,3 +657,4 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
 
 </body>
 </html>
+
