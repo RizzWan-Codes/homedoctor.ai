@@ -112,9 +112,92 @@
       margin-top: 0.5rem;
     }
     button:hover { background: #167b68; }
+
+    /* 🌿 Toast Styles */
+.toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 9999;
+    }
+
+    @media (max-width: 600px) {
+      .toast-container {
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        width: 90%;
+        max-width: 350px;
+      }
+    }
+
+    /* 🌈 Toast Box */
+    .toast {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 240px;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: toastSlide 0.4s ease forwards;
+      border-left: 5px solid #fff;
+    }
+
+    .toast.info {
+      background: linear-gradient(135deg, #1b9c85, #15997a);
+      border-left-color: #ffffffcc;
+    }
+
+    .toast.success {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      border-left-color: #bbf7d0;
+    }
+
+    .toast.error {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      border-left-color: #fecaca;
+    }
+
+    .toast button {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      margin-left: 10px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .toast button:hover {
+      opacity: 1;
+    }
+
+    @keyframes toastSlide {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- ✅ Toast Container -->
+<div id="toastContainer" class="toast-container"></div>
+
 <div id="authBox" class="auth-container">
 
   <div class="toggle-tabs">
@@ -169,6 +252,25 @@
   });
 </script>
 
+<script>
+function showToast(message, type = "info", duration = 2500) {
+  const container = document.getElementById("toastContainer");
+  const toast = document.createElement("div");
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `
+    <span>${message}</span>
+    <button onclick="this.parentElement.remove()">×</button>
+  `;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-20px)";
+    setTimeout(() => toast.remove(), 300);
+  }, duration);
+}
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = "https://iklnmtdeqorwvufewddr.supabase.co";
@@ -177,17 +279,29 @@
   const { createClient } = supabase;
   const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // 🚀 Auto redirect if logged in
+  (async () => {
+    const { data } = await db.auth.getSession();
+    if (data.session) {
+      window.location.href = "dashboard.html";
+    }
+  })();
+
+  // ✍️ SIGNUP HANDLER
   document.getElementById("signupBtn").addEventListener("click", async () => {
-    const username = document.getElementById("signupUsername").value;
-    const email = document.getElementById("signupEmail").value;
+    const username = document.getElementById("signupUsername").value.trim();
+    const email = document.getElementById("signupEmail").value.trim();
     const password = document.getElementById("signupPassword").value;
 
     if (!username || !email || !password) {
-      return alert("All fields are required!");
+      return showToast("All fields are required", "error");
     }
 
-    localStorage.setItem("pendingUsername", username);
-    alert("Signing up...");
+    if (password.length < 6) {
+      return showToast("Password must be at least 6 characters", "error");
+    }
+
+    showToast("Signing up...", "info");
 
     const { data, error } = await db.auth.signUp({
       email,
@@ -198,52 +312,62 @@
     });
 
     if (error) {
-      alert("Error: " + error.message);
-      return;
+      return showToast(`Signup failed: ${error.message}`, "error");
     }
 
-    alert("Signup successful! Check your email for verification.");
-  });
-
-  document.getElementById("loginBtn").addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
-
-    if (!email || !password) {
-      return alert("Please enter email and password.");
-    }
-
-    alert("Logging in...");
-
-    const { data, error } = await db.auth.signInWithPassword({ email, password });
-    if (error) {
-      alert("Login failed: " + error.message);
-      return;
-    }
-
-    const user = data.user;
-    alert("Login successful! Welcome " + user.email);
-    window.location.href="dashboard.html";
-    
-
-    const username = localStorage.getItem("pendingUsername");
-    if (username) {
+    // Create profile
+    if (data?.user) {
       const { error: insertError } = await db.from("profiles").upsert([
         {
-          id: user.id,
+          id: data.user.id,
           username,
           created_at: new Date().toISOString()
         }
       ]);
       if (insertError) {
         console.error("Profile insert error:", insertError);
-      } else {
-        console.log("Profile created successfully!");
-        localStorage.removeItem("pendingUsername");
       }
     }
+
+    showToast("Signup successful! Check your email 📧", "success");
+  });
+
+  // 🔐 LOGIN HANDLER
+  document.getElementById("loginBtn").addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value;
+
+    if (!email || !password) {
+      return showToast("Please enter email and password", "error");
+    }
+
+    showToast("Logging in...", "info");
+
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    if (error) {
+      return showToast(`Login failed: ${error.message}`, "error");
+    }
+
+    showToast("Login successful ✅", "success");
+    setTimeout(() => window.location.href = "dashboard.html", 800);
+  });
+
+  // ⌨️ Enter key support
+  document.querySelectorAll("input").forEach(input => {
+    input.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (document.getElementById("authBox").classList.contains("signup-active")) {
+          document.getElementById("signupBtn").click();
+        } else {
+          document.getElementById("loginBtn").click();
+        }
+      }
+    });
   });
 </script>
+
+
 </body>
 
 </html>
