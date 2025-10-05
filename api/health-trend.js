@@ -1,42 +1,20 @@
 // /api/health-trend.js
 import OpenAI from "openai";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  "https://iklnmtdeqorwvufewddr.supabase.co",
-  process.env.SUPABASE_SERVICE_KEY
-);
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
 
 export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
-      return res.status(405).json({ error: "Method Not Allowed" });
+      return res.status(405).json({ error: "Method not allowed" });
     }
 
-    const { userId } = req.body;
-    if (!userId) {
-      return res.status(400).json({ error: "Missing userId" });
-    }
-
-    // 📝 Fetch logs from Supabase
-    const { data: logs, error } = await supabase
-      .from("health_logs")
-      .select("severity, created_at, symptoms")
-      .eq("user_id", userId)
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.error("Supabase error:", error);
-      return res.status(500).json({ error: "Failed to fetch logs" });
-    }
-
+    const { logs } = req.body;
     if (!logs || logs.length === 0) {
-      return res.status(200).json({ message: "No health data yet." });
+      return res.status(400).json({ error: "No logs provided" });
     }
+
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
 
     const formattedLogs = logs
       .map(
@@ -47,35 +25,38 @@ export default async function handler(req, res) {
       )
       .join("\n");
 
+    // 🧠 Different prompt — for trends, diet, and plans
     const prompt = `
-You are a helpful digital health assistant.
-Analyze the following logs and generate:
-- 📈 A short health **trend** summary (improving, worsening, or stable)
-- 🥦 Diet recommendations
-- 🏋️ Exercise recommendations
-- 💡 3-5 personalized health tips
+    You are an expert health trend analyst, nutritionist, personal chef, and fitness coach.
+    Analyze the user's health logs and provide a detailed report including:
 
-Keep the output conversational, not JSON.
+    1. 📈 Health Trend: Is their health improving, worsening, or stable? Explain briefly.
+    2. 🥦 Nutrition Goals: Specify recommended daily nutrient goals based on their symptoms (e.g. protein, carbs, fats).
+    3. 📝 Diet Plan: Suggest a simple daily diet plan to meet those goals.
+    4. 👨‍🍳 Recipes: Give 2 healthy, easy recipes that meet their nutrition goals. Include ingredients, steps, and approximate macros.
+    5. 🏋️ Exercise Plan: Recommend a basic exercise plan (e.g. type, frequency, duration).
+    6. 💡 Health Tips: Practical lifestyle tips to maintain or improve their condition.
 
-Logs:
-${formattedLogs}
-`;
+    Keep it structured and concise. Avoid medical jargon.
 
-    // 🤖 OpenAI call
+    Logs:
+    ${formattedLogs}
+    `;
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
-        { role: "system", content: "You are a helpful health trend analyzer." },
-        { role: "user", content: prompt }
+        { role: "system", content: "You are a helpful health trend assistant." },
+        { role: "user", content: prompt },
       ],
-      max_tokens: 400,
+      max_tokens: 500,
     });
 
     const message = completion.choices[0].message.content;
-    return res.status(200).json({ trend: message });
+    res.status(200).json({ trend: message });
 
-  } catch (err) {
-    console.error("🔥 API Crash in health-trend.js:", err);
-    return res.status(500).json({ error: err.message || "Unknown server error" });
+  } catch (error) {
+    console.error("Health Trend Error:", error);
+    res.status(500).json({ error: "Failed to analyze health trend" });
   }
 }
