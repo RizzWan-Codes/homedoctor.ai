@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -306,41 +307,50 @@ symptomForm?.addEventListener("submit", async (e) => {
       return;
     }
 
-    const name = document.getElementById("name").value;
-    const age = document.getElementById("age").value;
+    const name = document.getElementById("name").value.trim();
+    const age = document.getElementById("age").value.trim();
     const gender = document.getElementById("gender").value;
-    const symptoms = document.getElementById("symptoms").value;
-    const details = document.getElementById("details").value;
-    const severityValue = severityLabel.textContent;
-    const userId = session.user.id;
+    const symptoms = document.getElementById("symptoms").value.trim();
+    const details = document.getElementById("details").value.trim();
+    const severityValue = severityLabel.textContent.trim();
+    const userId = session?.user?.id; // 👈 IMPORTANT
+
+    // 🧠 Check required fields before fetch
+    if (!name || !age || !gender || !symptoms || !userId) {
+      console.error("Missing required fields before sending:", { name, age, gender, symptoms, userId });
+      aiResponseBox.textContent = "⚠️ Please fill in all required fields.";
+      return;
+    }
 
     // 🔸 STEP 1: Fetch AI response
     aiResponseBox.textContent = "Analyzing your symptoms with AI... 🧠";
+
     const aiRes = await fetch("/api/ai-response", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, age, gender, symptoms, severity: severityValue, details }),
+      body: JSON.stringify({
+        name,
+        age,
+        gender,
+        symptoms,
+        severity: severityValue,
+        details,
+        userId, // ✅ FIXED
+      }),
     });
 
     const aiData = await aiRes.json();
-    if (aiData.error) throw new Error(aiData.error);
+    if (!aiRes.ok) {
+      throw new Error(aiData.error || "AI response failed");
+    }
 
-    // Display the AI response nicely with formatting
-    aiResponseBox.innerHTML = aiData.response.replace(/\n/g, "<br>");
+    // 🧠 Display AI message
+    aiResponseBox.innerHTML = aiData.message.replace(/\n/g, "<br>");
 
-    // 🔸 STEP 2: Deduct coins (before saving)
-    const newCoinCount = coins - 20;
-    const { error: coinError } = await supabase
-      .from("profiles")
-      .update({ coins: newCoinCount })
-      .eq("id", userId);
-    if (coinError) throw coinError;
-
-    coinsCount.textContent = newCoinCount;
-    coinsCountFooter.textContent = newCoinCount;
-    generateBtn.disabled = newCoinCount < 20;
-
-    // 💸 Small popup animation
+    // 🪙 Update coins (returned by API)
+    coinsCount.textContent = aiData.remainingCoins;
+    coinsCountFooter.textContent = aiData.remainingCoins;
+    generateBtn.disabled = aiData.remainingCoins < 20;
     showCoinPopup("-20 Coins 💸");
 
     // 🔸 STEP 3: Save health log AFTER AI response
@@ -351,8 +361,9 @@ symptomForm?.addEventListener("submit", async (e) => {
       gender,
       symptoms,
       severity: severityValue,
-      details
+      details,
     }]);
+
     if (insertError) throw insertError;
 
   } catch (err) {
