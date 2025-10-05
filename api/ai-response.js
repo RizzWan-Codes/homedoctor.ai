@@ -55,24 +55,28 @@ export default async function handler(req, res) {
 
     // 🧠 Build AI prompt (unchanged)
     const prompt = `
-You are an AI health assistant.
-Patient details:
+You are a professional medical AI assistant. Based on the following patient information, provide a clear, structured health assessment.
+
+Patient Info:
 - Name: ${name}
 - Age: ${age}
 - Gender: ${gender}
-- Symptoms: ${symptoms}
 - Severity: ${severity}
-- Additional Info: ${details}
+- Symptoms: ${symptoms}
+- Additional Details: ${details}
 
-Give a clear response and always in bullet points and in a neat way:
-1. Likely conditions (top 2–3)
-2. Differential uncertainty
-3. Urgency triage: GREEN, YELLOW, RED
-4. Next steps
+Format the response in clean text with clear numbered points, no markdown, no asterisks, and no restating the patient info. Keep it short and precise.
 
-At the very last, suggest the user 3 medicines and their doses which are most suitable according to their symptoms.
+Structure:
+1. Most Likely Conditions (top 2–3 brief points)
+2. Possible Uncertainties or Differential Diagnoses
+3. Recommended Next Steps (short and practical)
+4. Suggested Medications (3 common options with dosage)
 
-⚠️ This is NOT a substitute for professional medical advice.
+Rules:
+- Do NOT use *, #, or markdown formatting.
+- Do NOT repeat the patient info.
+- Keep language professional and concise.
 `;
 
     let message = "No response from AI";
@@ -112,3 +116,4 @@ At the very last, suggest the user 3 medicines and their doses which are most su
     return res.status(500).json({ error: "Server error occurred", details: err.message });
   }
 }
+
