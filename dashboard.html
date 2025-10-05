@@ -552,7 +552,7 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
   analyticsBox.textContent = "Analyzing your health trend with AI... 🧠💪";
 
   try {
-    const res = await fetch("/api/health-trend.js", {
+    const res = await fetch("/api/health-trend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: session.user.id })
@@ -678,3 +678,4 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
 
 </body>
 </html>
+
