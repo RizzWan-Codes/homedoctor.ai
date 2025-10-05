@@ -13,16 +13,14 @@ const openai = new OpenAI({
 
 export default async function handler(req, res) {
   try {
-    console.log("🚀 Health Trend API triggered");
-
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
     const { userId } = req.body;
-    console.log("📌 User ID:", userId);
-
-    if (!userId) return res.status(400).json({ error: "Missing userId" });
+    if (!userId) {
+      return res.status(400).json({ error: "Missing userId" });
+    }
 
     // 📝 Fetch logs from Supabase
     const { data: logs, error } = await supabase
@@ -32,17 +30,14 @@ export default async function handler(req, res) {
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("❌ Supabase fetch error:", error);
-      throw error;
+      console.error("Supabase error:", error);
+      return res.status(500).json({ error: "Failed to fetch logs" });
     }
-
-    console.log("📝 Logs fetched:", logs);
 
     if (!logs || logs.length === 0) {
       return res.status(200).json({ message: "No health data yet." });
     }
 
-    // Format logs
     const formattedLogs = logs
       .map(
         (l) =>
@@ -52,23 +47,21 @@ export default async function handler(req, res) {
       )
       .join("\n");
 
-    console.log("🧠 Formatted logs ready");
-
     const prompt = `
-    You are a professional digital health assistant. Analyze the following health logs and provide:
+You are a helpful digital health assistant.
+Analyze the following logs and generate:
+- 📈 A short health **trend** summary (improving, worsening, or stable)
+- 🥦 Diet recommendations
+- 🏋️ Exercise recommendations
+- 💡 3-5 personalized health tips
 
-    - 🩺 A short **trend analysis** (improving, worsening, stable)
-    - 🥦 **Diet recommendations**
-    - 🏋️ **Exercise recommendations**
-    - 💡 3–5 **personalized health tips**
+Keep the output conversational, not JSON.
 
-    Keep it conversational, no JSON.
+Logs:
+${formattedLogs}
+`;
 
-    Logs:
-    ${formattedLogs}
-    `;
-
-    console.log("🤖 Sending to OpenAI...");
+    // 🤖 OpenAI call
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -79,12 +72,10 @@ export default async function handler(req, res) {
     });
 
     const message = completion.choices[0].message.content;
-    console.log("✅ AI Response received");
-
     return res.status(200).json({ trend: message });
 
   } catch (err) {
-    console.error("🔥 health-trend.js error:", err);
-    return res.status(500).json({ error: err.message });
+    console.error("🔥 API Crash in health-trend.js:", err);
+    return res.status(500).json({ error: err.message || "Unknown server error" });
   }
 }
