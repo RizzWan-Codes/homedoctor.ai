@@ -549,13 +549,13 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
     return;
   }
 
-  analyticsBox.textContent = "Analyzing your health trend with AI... 🧠💪";
+  analyticsBox.textContent = "Analyzing your health trend with AI... 🧠📈";
 
   try {
     const res = await fetch("/api/health-trend", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: session.user.id })
+      body: JSON.stringify({ userId: session.user.id }),
     });
 
     const data = await res.json();
@@ -565,42 +565,12 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
       return;
     }
 
-    // 🧠 Build HTML view
-    const html = `
-      <h3>📈 <b>Trend Summary</b></h3>
-      <p>${data.trendSummary}</p>
-
-      <h3>🥦 <b>Nutrition Goals</b></h3>
-      <pre>${JSON.stringify(data.nutritionGoals, null, 2)}</pre>
-
-      <h3>📝 <b>Diet Plan</b></h3>
-      <ul>${data.dietPlan.map(item => `<li>${item}</li>`).join("")}</ul>
-
-      <h3>👨‍🍳 <b>Recipes</b></h3>
-      ${data.recipes.map(r => `
-        <div style="margin-bottom:10px;">
-          <b>${r.name}</b><br>
-          <i>Ingredients:</i> ${r.ingredients.join(", ")}<br>
-          <i>Instructions:</i> ${r.instructions}<br>
-          <small>Protein: ${r.approxProtein} | Carbs: ${r.carbs} | Fat: ${r.fat || 'N/A'}</small>
-        </div>
-      `).join("")}
-
-      <h3>🏋️ <b>Exercise Plan</b></h3>
-      <ul>${data.exercisePlan.map(item => `<li>${item}</li>`).join("")}</ul>
-
-      <h3>💡 <b>Health Tips</b></h3>
-      <ul>${data.tips.map(t => `<li>${t}</li>`).join("")}</ul>
-    `;
-
-    analyticsBox.innerHTML = html;
+    analyticsBox.textContent = data.trend;
   } catch (err) {
     console.error("Trend fetch error:", err);
-    analyticsBox.textContent = "Error analyzing trend 😔";
+    analyticsBox.textContent = "Failed to analyze health trend 😔";
   }
 });
-
-
 
   // 💳 RAZORPAY COIN TOP-UP
   buyCoinsBtn?.addEventListener("click", async () => {
@@ -678,4 +648,3 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
 
 </body>
 </html>
-
