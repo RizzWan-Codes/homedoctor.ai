@@ -542,44 +542,47 @@ document.getElementById("btn-insights")?.addEventListener("click", async () => {
   }
 });
 
-// 📅 HEALTH TREND BUTTON - AI powered 🍽️🏋️
+// 📅 HEALTH TREND BUTTON - same flow as insights, different API
 document.getElementById("btn-trend")?.addEventListener("click", async () => {
   if (!session?.user?.id) {
     analyticsBox.textContent = "Please login first.";
     return;
   }
 
-  analyticsBox.textContent = "Analyzing your health trend with AI... 🧠💪";
+  analyticsBox.textContent = "Analyzing your health trend... 📅🤖";
 
   try {
-    const res = await fetch("/api/health-trend", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId: session.user.id })
-    });
+    const { data: logs, error } = await supabase
+      .from("health_logs")
+      .select("symptoms,severity,created_at")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: true });
 
-    // 👇 handle non-JSON response safely
-    const text = await res.text();
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (err) {
-      throw new Error("Invalid JSON returned: " + text);
-    }
-
-    if (data.error) throw new Error(data.error);
-    if (data.message) {
-      analyticsBox.textContent = data.message;
+    if (error) throw error;
+    if (!logs || logs.length === 0) {
+      analyticsBox.textContent = "No logs found. Submit a health check first!";
       return;
     }
 
-    analyticsBox.textContent = data.trend;
+    const res = await fetch("/api/health-trend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ logs }),
+    });
 
+    const data = await res.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    // Preserve line breaks and formatting in GPT response
+    analyticsBox.innerHTML = data.trend.replace(/\n/g, "<br>");
   } catch (err) {
-    console.error("Trend fetch error:", err);
+    console.error("Trend error:", err);
     analyticsBox.textContent = "Failed to analyze health trend 😔";
   }
 });
+
 
   // 💳 RAZORPAY COIN TOP-UP
   buyCoinsBtn?.addEventListener("click", async () => {
@@ -657,4 +660,3 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
 
 </body>
 </html>
-
