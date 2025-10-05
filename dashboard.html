@@ -296,54 +296,71 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 📝 SYMPTOM FORM SUBMIT
-  symptomForm?.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    try {
-      let coins = parseInt(coinsCount.textContent);
-      if (coins < 20) {
-        alert("Not enough coins!");
-        return;
-      }
-
-      const name = document.getElementById("name").value;
-      const age = document.getElementById("age").value;
-      const gender = document.getElementById("gender").value;
-      const symptoms = document.getElementById("symptoms").value;
-      const details = document.getElementById("details").value;
-      const userId = session.user.id;
-      const severityValue = severityLabel.textContent;
-
-      // ➕ Insert log
-      const { error: insertError } = await supabase.from("health_logs").insert([{
-        user_id: userId,
-        name,
-        age: parseInt(age),
-        gender,
-        symptoms,
-        severity: severityValue,
-        details
-      }]);
-      if (insertError) throw insertError;
-
-      // 💸 Deduct coins
-      const newCoinCount = coins - 20;
-      const { error: coinError } = await supabase
-        .from("profiles")
-        .update({ coins: newCoinCount })
-        .eq("id", session.user.id);
-
-      if (coinError) throw coinError;
-
-      aiResponseBox.textContent = `✅ Health log saved. Coins deducted: 20`;
-      coinsCount.textContent = newCoinCount;
-      coinsCountFooter.textContent = newCoinCount;
-      generateBtn.disabled = newCoinCount < 20;
-
-    } catch (err) {
-      console.error("Symptom submit error:", err);
-      aiResponseBox.textContent = "Error submitting health log.";
+  // 📝 SYMPTOM FORM SUBMIT — AI FIRST, THEN LOG, THEN COIN POPUP
+symptomForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  try {
+    let coins = parseInt(coinsCount.textContent);
+    if (coins < 20) {
+      alert("Not enough coins!");
+      return;
     }
-  });
+
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+    const gender = document.getElementById("gender").value;
+    const symptoms = document.getElementById("symptoms").value;
+    const details = document.getElementById("details").value;
+    const severityValue = severityLabel.textContent;
+    const userId = session.user.id;
+
+    // 🔸 STEP 1: Fetch AI response
+    aiResponseBox.textContent = "Analyzing your symptoms with AI... 🧠";
+    const aiRes = await fetch("/api/ai-response", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, age, gender, symptoms, severity: severityValue, details }),
+    });
+
+    const aiData = await aiRes.json();
+    if (aiData.error) throw new Error(aiData.error);
+
+    // Display the AI response nicely with formatting
+    aiResponseBox.innerHTML = aiData.response.replace(/\n/g, "<br>");
+
+    // 🔸 STEP 2: Deduct coins (before saving)
+    const newCoinCount = coins - 20;
+    const { error: coinError } = await supabase
+      .from("profiles")
+      .update({ coins: newCoinCount })
+      .eq("id", userId);
+    if (coinError) throw coinError;
+
+    coinsCount.textContent = newCoinCount;
+    coinsCountFooter.textContent = newCoinCount;
+    generateBtn.disabled = newCoinCount < 20;
+
+    // 💸 Small popup animation
+    showCoinPopup("-20 Coins 💸");
+
+    // 🔸 STEP 3: Save health log AFTER AI response
+    const { error: insertError } = await supabase.from("health_logs").insert([{
+      user_id: userId,
+      name,
+      age: parseInt(age),
+      gender,
+      symptoms,
+      severity: severityValue,
+      details
+    }]);
+    if (insertError) throw insertError;
+
+  } catch (err) {
+    console.error("Symptom submit error:", err);
+    aiResponseBox.textContent = "❌ Error generating AI response.";
+  }
+});
+
 
   // 📊 ANALYTICS GRAPHS - FIXED VERSION
   document.getElementById("btn-graphs")?.addEventListener("click", async () => {
@@ -655,6 +672,37 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
 
   // 🟢 INIT
   loadProfile();
+
+  // 💸 Coin Popup Utility
+function showCoinPopup(text) {
+  const popup = document.createElement("div");
+  popup.textContent = text;
+  popup.style.position = "fixed";
+  popup.style.top = "20px";
+  popup.style.right = "20px";
+  popup.style.background = "#1b9c85";
+  popup.style.color = "#fff";
+  popup.style.padding = "10px 15px";
+  popup.style.borderRadius = "8px";
+  popup.style.boxShadow = "0 4px 15px rgba(0,0,0,0.15)";
+  popup.style.zIndex = "9999";
+  popup.style.fontWeight = "600";
+  popup.style.opacity = "0";
+  popup.style.transition = "opacity 0.3s, transform 0.3s";
+  document.body.appendChild(popup);
+
+  setTimeout(() => {
+    popup.style.opacity = "1";
+    popup.style.transform = "translateY(0)";
+  }, 10);
+
+  setTimeout(() => {
+    popup.style.opacity = "0";
+    popup.style.transform = "translateY(-10px)";
+    setTimeout(() => popup.remove(), 300);
+  }, 2500);
+}
+
 });
 </script>
 
