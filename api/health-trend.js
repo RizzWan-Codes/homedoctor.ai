@@ -13,11 +13,15 @@ const openai = new OpenAI({
 
 export default async function handler(req, res) {
   try {
+    console.log("🚀 Health Trend API triggered");
+
     if (req.method !== "POST") {
       return res.status(405).json({ error: "Method Not Allowed" });
     }
 
     const { userId } = req.body;
+    console.log("📌 User ID:", userId);
+
     if (!userId) return res.status(400).json({ error: "Missing userId" });
 
     // 📝 Fetch logs from Supabase
@@ -27,7 +31,13 @@ export default async function handler(req, res) {
       .eq("user_id", userId)
       .order("created_at", { ascending: true });
 
-    if (error) throw error;
+    if (error) {
+      console.error("❌ Supabase fetch error:", error);
+      throw error;
+    }
+
+    console.log("📝 Logs fetched:", logs);
+
     if (!logs || logs.length === 0) {
       return res.status(200).json({ message: "No health data yet." });
     }
@@ -42,22 +52,23 @@ export default async function handler(req, res) {
       )
       .join("\n");
 
-    // Prompt similar to AI insights, but focused on *trend, diet, exercise*
+    console.log("🧠 Formatted logs ready");
+
     const prompt = `
     You are a professional digital health assistant. Analyze the following health logs and provide:
 
-    - 🩺 A short **trend analysis** (is the user's health improving, worsening, or stable? Explain in 2–3 lines)
-    - 🥦 **Diet recommendations** (suggest key nutrition goals based on the trend)
-    - 🧍‍♂️ **Exercise recommendations** tailored to their current trend
+    - 🩺 A short **trend analysis** (improving, worsening, stable)
+    - 🥦 **Diet recommendations**
+    - 🏋️ **Exercise recommendations**
     - 💡 3–5 **personalized health tips**
 
-    Keep the tone friendly and motivating. Do not output JSON. Just write it clearly like a short report.
+    Keep it conversational, no JSON.
 
     Logs:
     ${formattedLogs}
     `;
 
-    // Ask OpenAI
+    console.log("🤖 Sending to OpenAI...");
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
@@ -68,10 +79,12 @@ export default async function handler(req, res) {
     });
 
     const message = completion.choices[0].message.content;
+    console.log("✅ AI Response received");
+
     return res.status(200).json({ trend: message });
 
   } catch (err) {
-    console.error("health-trend.js error:", err);
+    console.error("🔥 health-trend.js error:", err);
     return res.status(500).json({ error: err.message });
   }
 }
