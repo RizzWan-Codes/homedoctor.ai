@@ -2,7 +2,7 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // KEEP THIS IN BACKEND ONLY
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // KEEP THIS SAFE!
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
@@ -11,16 +11,17 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
-    // Log the incoming body
+    // Log incoming request for debugging
     console.log("Request body:", req.body);
 
     const { name, age, gender, symptoms, severity, details, userId } = req.body;
 
+    // ✅ Now correctly checks required fields including userId
     if (!name || !age || !gender || !symptoms || !userId) {
       return res.status(400).json({ error: "Missing required fields", body: req.body });
     }
 
-    // Fetch user coins
+    // 🧾 Fetch user coins
     const { data: profile, error: fetchError } = await supabase
       .from("profiles")
       .select("coins")
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Not enough coins" });
     }
 
-    // Deduct coins
+    // 💸 Deduct coins
     const remainingCoins = profile.coins - 20;
     const { error: updateError } = await supabase
       .from("profiles")
@@ -52,8 +53,8 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Failed to update coins", details: updateError.message });
     }
 
-    // Build AI prompt
-   const prompt = `
+    // 🧠 Build AI prompt (unchanged)
+    const prompt = `
 You are an AI health assistant.
 Patient details:
 - Name: ${name}
@@ -74,11 +75,10 @@ At the very last, suggest the user 3 medicines and their doses which are most su
 ⚠️ This is NOT a substitute for professional medical advice.
 `;
 
-
-    // Call OpenAI safely
     let message = "No response from AI";
 
     try {
+      // 🧠 Call OpenAI
       const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -92,8 +92,6 @@ At the very last, suggest the user 3 medicines and their doses which are most su
       });
 
       const aiData = await aiRes.json();
-
-      // Log OpenAI response
       console.log("OpenAI response:", aiData);
 
       if (aiData.choices?.[0]?.message?.content) {
@@ -106,13 +104,11 @@ At the very last, suggest the user 3 medicines and their doses which are most su
       message = `AI request failed: ${openAiErr.message}`;
     }
 
-    // Always return JSON
+    // ✅ Return both AI message & updated coin count
     return res.status(200).json({ message, remainingCoins });
+
   } catch (err) {
     console.error("Server error:", err);
     return res.status(500).json({ error: "Server error occurred", details: err.message });
   }
 }
-
-
-
