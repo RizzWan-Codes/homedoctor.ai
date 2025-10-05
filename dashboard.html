@@ -2,113 +2,93 @@
 <html lang="en">
 <head>
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard - Homedoctor.ai</title>
   <link rel="icon" href="hello.png">
   <style>
     html{scroll-behavior: smooth;}
-    /* === Keep all your original CSS === */
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; }
-    body { background: #f9fdfb; color: #222; line-height: 1.6; overflow-x: hidden; }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif}
+    body{background:#f9fdfb;color:#222;line-height:1.6;overflow-x:hidden;}
 
-    header {
-      position: fixed; top: 0; left: 0; width: 100%;
-      padding: 1rem 2rem; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
-      display: flex; justify-content: space-between; align-items: center; z-index: 1000;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    }
-    header .logo { font-size: 1.5rem; font-weight: 700; color: #1b9c85; }
-    nav { display: flex; gap: 1.5rem; }
-    nav a { text-decoration: none; color: #333; font-weight: 500; transition: color 0.3s; }
-    nav a:hover { color: #1b9c85; }
-    .menu-toggle { display: none; font-size: 1.8rem; cursor: pointer; }
-    @media (max-width: 768px) {
-      nav { display: none; flex-direction: column; background: white; position: absolute; top: 60px; right: 20px; padding: 1rem; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); border-radius: 10px; }
-      nav.active { display: flex; }
-      .menu-toggle { display: block; }
+    header{position:fixed;top:0;left:0;width:100%;padding:1rem 2rem;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);
+      display:flex;justify-content:space-between;align-items:center;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+    header .logo{font-size:1.5rem;font-weight:700;color:#1b9c85;}
+    nav{display:flex;gap:1.5rem;}
+    nav a{text-decoration:none;color:#333;font-weight:500;transition:color 0.3s;}
+    nav a:hover{color:#1b9c85;}
+    .menu-toggle{display:none;font-size:1.8rem;cursor:pointer;}
+    @media(max-width:768px){
+      nav{display:none;flex-direction:column;background:white;position:absolute;top:60px;right:20px;padding:1rem;
+        box-shadow:0 6px 20px rgba(0,0,0,0.1);border-radius:10px;}
+      nav.active{display:flex;}
+      .menu-toggle{display:block;}
     }
 
-    .hero {
-      min-height: 60vh;
-      background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
-      display: flex; align-items: center; justify-content: center;
-      padding: 8rem 2rem 2rem; text-align: center;
-    }
-    .hero h1 { font-size: 2.5rem; font-weight: 800; color: #145c4f; margin-bottom: 1rem; }
-    .hero p { font-size: 1.2rem; max-width: 650px; margin: 0 auto; color: #444; }
+    .hero{min-height:60vh;background:linear-gradient(135deg,#d9f9f2,#f9fdfb);display:flex;align-items:center;justify-content:center;
+      padding:8rem 2rem 2rem;text-align:center;}
+    .hero h1{font-size:2.5rem;font-weight:800;color:#145c4f;margin-bottom:1rem;}
+    .hero p{font-size:1.2rem;max-width:650px;margin:0 auto;color:#444;}
 
-    .coins { padding: 4rem 2rem; background: white; text-align: center; }
-    .coins h2 { font-size: 2rem; margin-bottom: 1rem; color: #145c4f; }
-    .coins p { font-size: 1.1rem; margin-bottom: 2rem; }
-    .generate-btn {
-      padding: 1rem 2.5rem; background: #1b9c85; color: white; border: none; border-radius: 30px;
-      font-size: 1.1rem; cursor: pointer; transition: background 0.3s;
-    }
-    .generate-btn:hover { background: #167b68; }
-    .generate-btn:disabled { background: gray; cursor: not-allowed; }
+    .coins{padding:4rem 2rem;background:white;text-align:center;}
+    .coins h2{font-size:2rem;margin-bottom:1rem;color:#145c4f;}
+    .coins p{font-size:1.1rem;margin-bottom:2rem;}
+    .generate-btn{padding:1rem 2.5rem;background:#1b9c85;color:white;border:none;border-radius:30px;
+      font-size:1.1rem;cursor:pointer;transition:background 0.3s;}
+    .generate-btn:hover{background:#167b68;}
+    .generate-btn:disabled{background:gray;cursor:not-allowed;}
 
-    .form-container {
-      max-width: 700px; margin: 2rem auto 0; padding: 2rem; border-radius: 15px;
-      background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      display: none; animation: fadeSlide 0.5s ease forwards;
-    }
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(-15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .form-group { margin-bottom: 1.5rem; text-align: left; }
-    label { font-weight: 600; margin-bottom: 8px; display: block; color: #145c4f; }
-    input, select, textarea {
-      width: 100%; padding: 12px; border: 1px solid #d1fae5; border-radius: 10px; font-size: 16px;
-    }
-    textarea { resize: none; height: 80px; }
-    .submit-btn {
-      background: #1b9c85; color: white; border: none; padding: 1rem;
-      border-radius: 12px; font-size: 1.1rem; cursor: pointer; width: 100%;
-    }
-    .submit-btn:hover { background: #167b68; }
+    .form-container{max-width:700px;margin:2rem auto 0;padding:2rem;border-radius:15px;background:#fff;
+      box-shadow:0 4px 15px rgba(0,0,0,0.05);display:none;animation:fadeSlide 0.5s ease forwards;}
+    @keyframes fadeSlide{from{opacity:0;transform:translateY(-15px);}to{opacity:1;transform:translateY(0);}}
+    .form-group{margin-bottom:1.5rem;text-align:left;}
+    label{font-weight:600;margin-bottom:8px;display:block;color:#145c4f;}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #d1fae5;border-radius:10px;font-size:16px;}
+    textarea{resize:none;height:80px;}
+    .submit-btn{background:#1b9c85;color:white;border:none;padding:1rem;border-radius:12px;font-size:1.1rem;cursor:pointer;width:100%;}
+    .submit-btn:hover{background:#167b68;}
 
-    .slider {
-      width: 100%;
-      height: 10px;
-      border-radius: 5px;
-      background: linear-gradient(to right,
-        #22c55e 0% 33.33%,
-        #eab308 33.33% 66.66%,
-        #f97316 66.66% 100%);
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
+    .slider{width:100%;height:10px;border-radius:5px;
+      background:linear-gradient(to right,#22c55e 0% 33.33%,#eab308 33.33% 66.66%,#f97316 66.66% 100%);
+      outline:none;-webkit-appearance:none;appearance:none;}
+    .slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;background:#22c55e;cursor:pointer;}
+    .slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#22c55e;cursor:pointer;}
+    .severity-labels{display:flex;justify-content:space-between;font-size:0.9rem;margin-top:8px;}
+    .section{padding:5rem 2rem;background:#f9fdfb;text-align:center;}
+    .section h2{font-size:2rem;color:#145c4f;margin-bottom:1rem;}
+    .section p{max-width:750px;margin:0 auto;color:#444;font-size:1.1rem;}
+    footer{padding:2rem;background:#145c4f;color:white;text-align:center;}
+    footer a{color:#aef3e7;text-decoration:none;font-weight:500;}
+    footer a:hover{text-decoration:underline;}
+    .credits{margin-top:1rem;font-size:0.9rem;color:#cfeee8;}
+    .response-box{margin-top:1rem;padding:1rem;background:#f0fdf4;border-radius:12px;color:#145c4f;min-height:50px;}
+
+    #topup{background-color:#d1e6e2;}
+
+    .analytics-controls{margin-top:1rem;}
+    .analytics-buttons{display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;}
+    .analytics-buttons .pill{background:#145c4f;color:#fff;border:0;padding:0.7rem 1rem;
+      border-radius:9999px;cursor:pointer;transition:transform .08s ease,opacity .2s ease;}
+    .analytics-buttons .pill:hover{transform:translateY(-1px);opacity:.95;}
+
+    /* Graph layout */
+    .charts-container{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:1rem;
+      margin-top:1rem;
     }
-    .slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: #22c55e;
-      cursor: pointer;
-      transition: background 0.3s;
+    .chart-box{
+      background:#fff;
+      padding:1rem;
+      border-radius:12px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.05);
+      height:250px;
     }
-    .slider::-moz-range-thumb {
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: #22c55e;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .severity-labels { display: flex; justify-content: space-between; font-size: 0.9rem; margin-top: 8px; }
-    .section { padding: 5rem 2rem; background: #f9fdfb; text-align: center; }
-    .section h2 { font-size: 2rem; color: #145c4f; margin-bottom: 1rem; }
-    .section p { max-width: 750px; margin: 0 auto; color: #444; font-size: 1.1rem; }
-    footer { padding: 2rem; background: #145c4f; color: white; text-align: center; }
-    footer a { color: #aef3e7; text-decoration: none; font-weight: 500; }
-    footer a:hover { text-decoration: underline; }
-    .credits { margin-top: 1rem; font-size: 0.9rem; color: #cfeee8; }
-    .response-box { margin-top: 1rem; padding: 1rem; background: #f0fdf4; border-radius: 12px; color: #145c4f; min-height: 50px; }
-  
-    #topup{
-      background-color: #d1e6e2;
+    canvas{max-width:100%;height:100%;}
+    @media(max-width:768px){
+      .charts-container{grid-template-columns:1fr;}
     }
   </style>
 </head>
@@ -142,7 +122,7 @@
           <label>Name</label>
           <input type="text" id="name" placeholder="Your name" required>
         </div>
-        <div class="form-group" style="display:flex; gap:1rem;">
+        <div class="form-group" style="display:flex;gap:1rem;">
           <div style="flex:1;">
             <label>Age</label>
             <input type="number" id="age" placeholder="e.g. 25" required>
@@ -169,7 +149,7 @@
             <span style="color:#eab308;">Moderate</span>
             <span style="color:#f97316;">Severe</span>
           </div>
-          <p id="severityLabel" style="text-align:center; font-weight:bold; margin-top:10px; color:#22c55e;">Mild</p>
+          <p id="severityLabel" style="text-align:center;font-weight:bold;margin-top:10px;color:#22c55e;">Mild</p>
         </div>
         <div class="form-group">
           <label>Additional Details</label>
@@ -177,7 +157,26 @@
         </div>
         <button type="submit" class="submit-btn">Check My Health</button>
       </form>
+
       <div class="response-box" id="ai-response">Your AI Insights Will Appear Here...</div>
+
+      <div class="analytics-controls" id="analyticsControls">
+        <div class="analytics-buttons">
+          <button type="button" class="pill" id="btn-graphs">Graphs 📊</button>
+          <button type="button" class="pill" id="btn-insights">AI Insights 🧠</button>
+          <button type="button" class="pill" id="btn-trend">Health Trend 📅</button>
+        </div>
+        <div class="response-box" id="analytics-response">
+  Analytics will appear here...
+</div>
+
+<div class="charts-container" style="display:none;" id="chartsContainer">
+  <div class="chart-box"><canvas id="lineChart"></canvas></div>
+  <div class="chart-box"><canvas id="barChart"></canvas></div>
+</div>
+
+      </div>
+
     </div>
   </section>
 
@@ -188,25 +187,19 @@
 
   <section class="section" id="about">
     <h2>About Homedoctor.ai</h2>
-    <p>
-      Homedoctor.ai helps you understand your health better with smart AI insights. 
-      Manage your well-being, track improvements, and explore preventive care options — 
-      all in one place.
-    </p>
+    <p>Homedoctor.ai helps you understand your health better with smart AI insights. Manage your well-being, track improvements, and explore preventive care options — all in one place.</p>
   </section>
 
   <section class="section" id="topup">
-  <h2>Top-Up Coins</h2>
-  <p>Your Current Coins: <b id="coins-count-footer">--</b></p>
-
-  <div style="margin:1rem 0;">
-    <input type="number" id="coinInput" placeholder="Enter coins (20, 40, 60...)" min="20" step="20"
-           style="padding:0.8rem; border-radius:10px; border:1px solid #d1fae5; width:150px;">
-    <button id="buyCoinsBtn" class="generate-btn">Buy Coins</button>
-  </div>
-  <p style="font-size:0.9rem; color:#555;">Each coin costs ₹1. You can only buy in multiples of 20 coins.</p>
-</section>
-
+    <h2>Top-Up Coins</h2>
+    <p>Your Current Coins: <b id="coins-count-footer">--</b></p>
+    <div style="margin:1rem 0;">
+      <input type="number" id="coinInput" placeholder="Enter coins (20, 40, 60...)" min="20" step="20"
+      style="padding:0.8rem;border-radius:10px;border:1px solid #d1fae5;width:150px;">
+      <button id="buyCoinsBtn" class="generate-btn">Buy Coins</button>
+    </div>
+    <p style="font-size:0.9rem;color:#555;">Each coin costs ₹1. You can only buy in multiples of 20 coins.</p>
+  </section>
 
   <footer>
     <p>Contact us at <a href="mailto:rizwanboss84@gmail.com">info@homedoctor.ai</a></p>
@@ -214,61 +207,103 @@
   </footer>
 
   <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const supabaseUrl = "https://iklnmtdeqorwvufewddr.supabase.co";
-    const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs"; // replace with Service Role key
-    const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = "https://iklnmtdeqorwvufewddr.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs";
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const toggle = document.getElementById("menu-toggle");
-    const nav = document.getElementById("nav");
-    const generateBtn = document.getElementById("generateBtn");
-    const healthForm = document.getElementById("healthForm");
-    const severity = document.getElementById("severity");
-    const severityLabel = document.getElementById("severityLabel");
-    const coinsCount = document.getElementById("coins-count");
-    const welcomeText = document.getElementById("welcomeText");
-    const logoutLink = document.getElementById("logoutLink");
-    const symptomForm = document.getElementById("symptomForm");
-    const aiResponseBox = document.getElementById("ai-response");
-    let session;
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔸 ELEMENTS
+  const toggle = document.getElementById("menu-toggle");
+  const nav = document.getElementById("nav");
+  const generateBtn = document.getElementById("generateBtn");
+  const healthForm = document.getElementById("healthForm");
+  const severity = document.getElementById("severity");
+  const severityLabel = document.getElementById("severityLabel");
+  const coinsCount = document.getElementById("coins-count");
+  const coinsCountFooter = document.getElementById("coins-count-footer");
+  const welcomeText = document.getElementById("welcomeText");
+  const logoutLink = document.getElementById("logoutLink");
+  const symptomForm = document.getElementById("symptomForm");
+  const aiResponseBox = document.getElementById("ai-response");
+  const analyticsBox = document.getElementById("analytics-response");
+  const chartsContainer = document.getElementById("chartsContainer");
+  const buyCoinsBtn = document.getElementById("buyCoinsBtn");
+  const coinInput = document.getElementById("coinInput");
 
-    toggle.addEventListener("click", () => nav.classList.toggle("active"));
+  let session = null;
 
-    severity.addEventListener("input", () => {
-      const val = severity.value;
-      if(val==1){severityLabel.textContent="Mild";severityLabel.style.color="#22c55e";}
-      else if(val==2){severityLabel.textContent="Moderate";severityLabel.style.color="#eab308";}
-      else{severityLabel.textContent="Severe";severityLabel.style.color="#f97316";}
-    });
+  // 🟢 NAV
+  toggle?.addEventListener("click", () => nav.classList.toggle("active"));
 
-    generateBtn.addEventListener("click", () => {
-      healthForm.style.display = healthForm.style.display==="block"?"none":"block";
-    });
+  // 🟡 SEVERITY SLIDER
+  severity?.addEventListener("input", () => {
+    const val = severity.value;
+    if (val == 1) {
+      severityLabel.textContent = "Mild";
+      severityLabel.style.color = "#22c55e";
+    } else if (val == 2) {
+      severityLabel.textContent = "Moderate";
+      severityLabel.style.color = "#eab308";
+    } else {
+      severityLabel.textContent = "Severe";
+      severityLabel.style.color = "#f97316";
+    }
+  });
 
-    async function loadProfile(){
+  // 🧠 TOGGLE FORM
+  generateBtn?.addEventListener("click", () => {
+    healthForm.style.display = healthForm.style.display === "block" ? "none" : "block";
+  });
+
+  // 🧠 LOAD PROFILE
+  async function loadProfile() {
+    try {
       const { data } = await supabase.auth.getSession();
       session = data.session;
-      if(!session){ window.location.href="login.html"; return; }
+      if (!session) {
+        window.location.href = "login.html";
+        return;
+      }
+
       const user = session.user;
-      const { data: profile } = await supabase.from("profiles").select("username,coins").eq("id",user.id).single();
-      const username = profile?.username||user.email.split("@")[0];
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("username,coins")
+        .eq("id", user.id)
+        .single();
+
+      if (error) throw error;
+
+      const username = profile?.username || user.email.split("@")[0];
       const coins = profile?.coins ?? 0;
+
       welcomeText.textContent = `Welcome, ${username}!`;
       coinsCount.textContent = coins;
+      coinsCountFooter.textContent = coins;
       generateBtn.disabled = coins < 20;
+    } catch (err) {
+      console.error("Profile load error:", err);
     }
+  }
 
-    logoutLink.addEventListener("click", async(e)=>{
-      e.preventDefault();
-      await supabase.auth.signOut();
-      window.location.href="login.html";
-    });
+  // 🔴 LOGOUT
+  logoutLink?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    await supabase.auth.signOut();
+    window.location.href = "login.html";
+  });
 
-    symptomForm.addEventListener("submit", async(e)=>{
-      e.preventDefault();
+  // 📝 SYMPTOM FORM SUBMIT
+  symptomForm?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try {
       let coins = parseInt(coinsCount.textContent);
-      if(coins<20){ alert("Not enough coins!"); return; }
+      if (coins < 20) {
+        alert("Not enough coins!");
+        return;
+      }
 
       const name = document.getElementById("name").value;
       const age = document.getElementById("age").value;
@@ -276,105 +311,370 @@
       const symptoms = document.getElementById("symptoms").value;
       const details = document.getElementById("details").value;
       const userId = session.user.id;
+      const severityValue = severityLabel.textContent;
 
-      try{
-        const res = await fetch("/api/ai-response.js",{
-          method:"POST",
-          headers:{"Content-Type":"application/json"},
-          body:JSON.stringify({ name, age, gender, symptoms, severity:severityLabel.textContent, details, userId })
-        });
-        const data = await res.json();
-        if(data.message){
-          aiResponseBox.textContent = data.message;
-          coinsCount.textContent = data.remainingCoins;
-          generateBtn.disabled = data.remainingCoins < 20;
-        } else {
-          aiResponseBox.textContent = "Error: "+(data.error||"Something went wrong");
-        }
-      } catch(err){
-        aiResponseBox.textContent = "Error: "+err.message;
+      // ➕ Insert log
+      const { error: insertError } = await supabase.from("health_logs").insert([{
+        user_id: userId,
+        name,
+        age: parseInt(age),
+        gender,
+        symptoms,
+        severity: severityValue,
+        details
+      }]);
+      if (insertError) throw insertError;
+
+      // 💸 Deduct coins
+      const newCoinCount = coins - 20;
+      const { error: coinError } = await supabase
+        .from("profiles")
+        .update({ coins: newCoinCount })
+        .eq("id", session.user.id);
+
+      if (coinError) throw coinError;
+
+      aiResponseBox.textContent = `✅ Health log saved. Coins deducted: 20`;
+      coinsCount.textContent = newCoinCount;
+      coinsCountFooter.textContent = newCoinCount;
+      generateBtn.disabled = newCoinCount < 20;
+
+    } catch (err) {
+      console.error("Symptom submit error:", err);
+      aiResponseBox.textContent = "Error submitting health log.";
+    }
+  });
+
+  // 📊 ANALYTICS GRAPHS - FIXED VERSION
+  document.getElementById("btn-graphs")?.addEventListener("click", async () => {
+    if (!session?.user?.id) {
+      analyticsBox.textContent = "Please login first.";
+      return;
+    }
+
+    analyticsBox.textContent = "Loading graphs...";
+    chartsContainer.style.display = "grid";
+
+    try {
+      const { data: logs, error } = await supabase
+        .from("health_logs")
+        .select("severity,created_at")
+        .eq("user_id", session.user.id)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
       }
 
-      loadProfile();
-    });
+      if (!logs || logs.length === 0) {
+        analyticsBox.textContent = "No health data yet. Submit a symptom check first!";
+        chartsContainer.style.display = "none";
+        return;
+      }
 
-    loadProfile();
+      // Format labels and severity values
+      const labels = logs.map(l => {
+        const date = new Date(l.created_at);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      });
 
-const buyCoinsBtn = document.getElementById("buyCoinsBtn");
-const coinInput = document.getElementById("coinInput");
-const coinsCountFooter = document.getElementById("coins-count-footer");
+      const severityValues = logs.map(l => {
+        if (l.severity === "Mild") return 1;
+        if (l.severity === "Moderate") return 2;
+        if (l.severity === "Severe") return 3;
+        return 1; // default to Mild if unknown
+      });
 
-function updateCoinsUI(coins) {
-  coinsCount.textContent = coins;
-  coinsCountFooter.textContent = coins;
-}
+      // Count severity occurrences
+      const counts = { Mild: 0, Moderate: 0, Severe: 0 };
+      logs.forEach(l => {
+        if (l.severity in counts) {
+          counts[l.severity]++;
+        }
+      });
 
-buyCoinsBtn.addEventListener("click", async () => {
-  const coinsToBuy = parseInt(coinInput.value);
-  if (!coinsToBuy || coinsToBuy < 20 || coinsToBuy % 20 !== 0) {
-    alert("Enter coins in multiples of 20, minimum 20.");
+      // Get canvas contexts
+      const lineCanvas = document.getElementById("lineChart");
+      const barCanvas = document.getElementById("barChart");
+
+      if (!lineCanvas || !barCanvas) {
+        throw new Error("Canvas elements not found");
+      }
+
+      const lineCtx = lineCanvas.getContext("2d");
+      const barCtx = barCanvas.getContext("2d");
+
+      // Destroy existing charts if they exist
+      if (window.lineChartInstance) {
+        window.lineChartInstance.destroy();
+      }
+      if (window.barChartInstance) {
+        window.barChartInstance.destroy();
+      }
+
+      // Create Line Chart
+      window.lineChartInstance = new Chart(lineCtx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "Severity Over Time",
+            data: severityValues,
+            borderColor: "#1b9c85",
+            backgroundColor: "rgba(27, 156, 133, 0.1)",
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointBackgroundColor: "#1b9c85"
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top'
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              min: 0,
+              max: 3.5,
+              ticks: {
+                stepSize: 1,
+                callback: function(value) {
+                  const labels = ["", "Mild", "Moderate", "Severe"];
+                  return labels[value] || "";
+                }
+              }
+            },
+            x: {
+              ticks: {
+                maxRotation: 45,
+                minRotation: 45
+              }
+            }
+          }
+        }
+      });
+
+      // Create Bar Chart
+      window.barChartInstance = new Chart(barCtx, {
+        type: "bar",
+        data: {
+          labels: ["Mild", "Moderate", "Severe"],
+          datasets: [{
+            label: "Frequency",
+            data: [counts.Mild, counts.Moderate, counts.Severe],
+            backgroundColor: ["#22c55e", "#eab308", "#f97316"],
+            borderWidth: 0,
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
+        }
+      });
+
+      analyticsBox.textContent = `📊 Showing ${logs.length} health log${logs.length > 1 ? 's' : ''}`;
+
+    } catch (err) {
+      console.error("Graph error:", err);
+      analyticsBox.textContent = `Error loading graphs: ${err.message}`;
+      chartsContainer.style.display = "none";
+    }
+  });
+
+  // 🧠 AI INSIGHTS
+document.getElementById("btn-insights")?.addEventListener("click", async () => {
+  if (!session?.user?.id) {
+    analyticsBox.textContent = "Please login first.";
     return;
   }
 
+  analyticsBox.textContent = "Generating AI Insights... 🧠";
+
   try {
-    // Step 1: Create Razorpay order
-    const orderRes = await fetch("/api/create-order", {
+    const { data: logs, error } = await supabase
+      .from("health_logs")
+      .select("symptoms,severity,created_at")
+      .eq("user_id", session.user.id)
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+    if (!logs || logs.length === 0) {
+      analyticsBox.textContent = "No logs found. Submit a health check first!";
+      return;
+    }
+
+    const res = await fetch("/api/ai-insights", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ coins: coinsToBuy })
+      body: JSON.stringify({ logs }),
     });
-    const orderData = await orderRes.json();
-    if (orderData.error) return alert(orderData.error);
 
-    // Step 2: Open Razorpay Checkout
-    const options = {
-      key: "rzp_live_RJofyRfetD0Gdz", // <-- replace with your Razorpay Key ID
-      amount: orderData.order.amount,
-      currency: "INR",
-      name: "Homedoctor.ai",
-      description: `${coinsToBuy} Coins Top-Up`,
-      order_id: orderData.order.id,
-      handler: async function (response) {
-        try {
-          // Step 3: Verify payment & update coins in Supabase
-          const verifyRes = await fetch("/api/verify-payment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              user_id: session.user.id,
-              coins: coinsToBuy
-            })
-          });
+    const data = await res.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
 
-          const verifyData = await verifyRes.json();
-          if (verifyData.success) {
-            updateCoinsUI(verifyData.updatedCoins);
-            alert("Coins added successfully!");
-          } else {
-            alert("Payment verification failed: " + verifyData.error);
-          }
-        } catch (err) {
-          alert("Error verifying payment: " + err.message);
-        }
-      },
-      prefill: { email: session.user.email }, // optional
-      theme: { color: "#1b9c85" }
-    };
-
-    const rzp = new Razorpay(options);
-    rzp.open();
-
+    analyticsBox.textContent = data.insights;
   } catch (err) {
-    alert("Error: " + err.message);
+    console.error("AI Insights error:", err);
+    analyticsBox.textContent = "Failed to generate AI Insights 😔";
+  }
+});
+
+// 📅 HEALTH TREND BUTTON - AI powered 🍽️🏋️
+document.getElementById("btn-trend")?.addEventListener("click", async () => {
+  if (!session?.user?.id) {
+    analyticsBox.textContent = "Please login first.";
+    return;
+  }
+
+  analyticsBox.textContent = "Analyzing your health trend with AI... 🧠💪";
+
+  try {
+    const res = await fetch("/api/health-trend.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: session.user.id })
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    if (data.message) {
+      analyticsBox.textContent = data.message;
+      return;
+    }
+
+    // 🧠 Build HTML view
+    const html = `
+      <h3>📈 <b>Trend Summary</b></h3>
+      <p>${data.trendSummary}</p>
+
+      <h3>🥦 <b>Nutrition Goals</b></h3>
+      <pre>${JSON.stringify(data.nutritionGoals, null, 2)}</pre>
+
+      <h3>📝 <b>Diet Plan</b></h3>
+      <ul>${data.dietPlan.map(item => `<li>${item}</li>`).join("")}</ul>
+
+      <h3>👨‍🍳 <b>Recipes</b></h3>
+      ${data.recipes.map(r => `
+        <div style="margin-bottom:10px;">
+          <b>${r.name}</b><br>
+          <i>Ingredients:</i> ${r.ingredients.join(", ")}<br>
+          <i>Instructions:</i> ${r.instructions}<br>
+          <small>Protein: ${r.approxProtein} | Carbs: ${r.carbs} | Fat: ${r.fat || 'N/A'}</small>
+        </div>
+      `).join("")}
+
+      <h3>🏋️ <b>Exercise Plan</b></h3>
+      <ul>${data.exercisePlan.map(item => `<li>${item}</li>`).join("")}</ul>
+
+      <h3>💡 <b>Health Tips</b></h3>
+      <ul>${data.tips.map(t => `<li>${t}</li>`).join("")}</ul>
+    `;
+
+    analyticsBox.innerHTML = html;
+  } catch (err) {
+    console.error("Trend fetch error:", err);
+    analyticsBox.textContent = "Error analyzing trend 😔";
   }
 });
 
 
-  </script>
+
+  // 💳 RAZORPAY COIN TOP-UP
+  buyCoinsBtn?.addEventListener("click", async () => {
+    const coinsToBuy = parseInt(coinInput.value);
+    if (!coinsToBuy || coinsToBuy < 20 || coinsToBuy % 20 !== 0) {
+      alert("Enter coins in multiples of 20, minimum 20.");
+      return;
+    }
+
+    try {
+      // 🔸 Create order
+      const orderRes = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coins: coinsToBuy })
+      });
+
+      const orderData = await orderRes.json();
+      if (orderData.error) {
+        alert(orderData.error);
+        return;
+      }
+
+      // 🧾 Launch Razorpay
+      const options = {
+        key: "rzp_live_RJofyRfetD0Gdz",
+        amount: orderData.order.amount,
+        currency: "INR",
+        name: "Homedoctor.ai",
+        description: `${coinsToBuy} Coins Top-Up`,
+        order_id: orderData.order.id,
+        handler: async (response) => {
+          try {
+            const verifyRes = await fetch("/api/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                user_id: session.user.id,
+                coins: coinsToBuy
+              })
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              coinsCount.textContent = verifyData.updatedCoins;
+              coinsCountFooter.textContent = verifyData.updatedCoins;
+              alert("Coins added successfully!");
+            } else {
+              alert("Payment verification failed: " + verifyData.error);
+            }
+          } catch (err) {
+            alert("Error verifying payment: " + err.message);
+          }
+        },
+        prefill: { email: session.user.email },
+        theme: { color: "#1b9c85" }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      console.error("Razorpay error:", err);
+      alert("Error: " + err.message);
+    }
+  });
+
+  // 🟢 INIT
+  loadProfile();
+});
+</script>
+
 </body>
 </html>
-
-
