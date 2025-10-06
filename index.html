@@ -2,9 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Homedoctor.ai - Your AI Health Companion</title>
-  <link rel="icon" href="hello.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1b9c85" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Homedoctor.ai">
+<link rel="apple-touch-icon" href="hello.png" />
+<link rel="manifest" href="manifest.json" />
+<title>Homedoctor.ai - Your AI Health Companion</title>
+<link rel="icon" href="hello.png" />
   <style>
     /* Reset */
 
@@ -433,6 +439,51 @@ input[type="range"]::-moz-range-thumb {
   transform: scale(1.05);
 }
 
+.install-section {
+  background: linear-gradient(135deg, #e0fff5, #f9fdfb);
+  text-align: center;
+  padding: 3rem 1.5rem;
+  margin-top: 2rem;
+  border-top: 1px solid #d1fae5;
+}
+
+.install-section h2 {
+  font-size: 1.8rem;
+  color: #145c4f;
+  margin-bottom: 0.5rem;
+}
+
+.install-section p {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 1.5rem;
+}
+
+/* Reusing the same button styles we made earlier 👇 */
+.install-btn {
+  background: linear-gradient(135deg, #1b9c85, #15997a);
+  color: white;
+  border: none;
+  padding: 0.9rem 1.5rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.install-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #15997a, #12876c);
+}
+
+.install-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
   </style>
 </head>
 <body>
@@ -444,7 +495,8 @@ input[type="range"]::-moz-range-thumb {
       <a href="#about">About</a>
       <a href="#contact">Contact</a>
       <a href="#checker">See Your Health</a>
-      <button class="login-btn" onclick="window.open('login.html','_blank')"><b>Login / Sign Up</b></button>
+      <button class="login-btn" onclick="window.location.href='login.html'"><b>Login / Sign Up</b></button>
+
     </nav>
   </header>
 
@@ -533,6 +585,13 @@ input[type="range"]::-moz-range-thumb {
   <div id="result" class="result-box">Your Results:</div>
 </section>
 
+<section class="install-section">
+  <h2>Get the Homedoctor.ai App 🩺</h2>
+  <p>Install our app for quick access and a full-screen experience — no browser needed!</p>
+  <button id="installBtn" class="install-btn">
+    📥 Download Our App
+  </button>
+</section>
 
   <div class="made-by-tag">Made By Developer Rizwan</div>
 
@@ -649,6 +708,51 @@ input[type="range"]::-moz-range-thumb {
     return container;
   }
 </script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(() => console.log("Service Worker registered ✅"))
+        .catch(err => console.log("SW registration failed:", err));
+    });
+  }
+</script>
+
+<script>
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+
+  installBtn.style.display = 'none';
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('✅ App installed');
+      } else {
+        console.log('❌ Install dismissed');
+      }
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    console.log('🎉 PWA installed');
+    installBtn.style.display = 'none';
+  });
+</script>
+
+
 
 </body>
 </html>
