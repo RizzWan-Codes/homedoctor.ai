@@ -1,0 +1,22 @@
+{
+  "name": "Homedoctor.ai",
+  "short_name": "Homedoctor",
+  "description": "Your AI Health Companion — symptom checking, trends, insights, all offline.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1b9c85",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "hello.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "hello.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
