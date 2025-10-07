@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         { role: "system", content: "You are a helpful health trend assistant." },
         { role: "user", content: prompt },
       ],
-      max_tokens: 500,
+      max_tokens: 600,
     });
 
     const message = completion.choices[0].message.content;
@@ -60,3 +60,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Failed to analyze health trend" });
   }
 }
+
