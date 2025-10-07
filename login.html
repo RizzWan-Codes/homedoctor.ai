@@ -2,9 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Auth - Homedoctor.ai</title>
-  <link rel="icon" href="hello.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1b9c85" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Homedoctor.ai">
+<link rel="apple-touch-icon" href="hello.png" />
+<link rel="manifest" href="manifest.json" />
+<title>Auth - Homedoctor.ai</title>
+<link rel="icon" href="hello.png" />
   <style>
     body {
       background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
@@ -287,93 +293,50 @@ function showToast(message, type = "info", duration = 2500) {
     }
   })();
 
-// ✍️ ROBUST SIGNUP HANDLER - Ensures profile is created
-document.getElementById("signupBtn").addEventListener("click", async () => {
-  const username = document.getElementById("signupUsername").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
-  const password = document.getElementById("signupPassword").value;
+  // ✍️ SIGNUP HANDLER
+  document.getElementById("signupBtn").addEventListener("click", async () => {
+    const username = document.getElementById("signupUsername").value.trim();
+    const email = document.getElementById("signupEmail").value.trim();
+    const password = document.getElementById("signupPassword").value;
 
-  if (!username || !email || !password) {
-    return showToast("All fields are required", "error");
-  }
+    if (!username || !email || !password) {
+      return showToast("All fields are required", "error");
+    }
 
-  if (password.length < 6) {
-    return showToast("Password must be at least 6 characters", "error");
-  }
+    if (password.length < 6) {
+      return showToast("Password must be at least 6 characters", "error");
+    }
 
-  showToast("Signing up...", "info");
+    showToast("Signing up...", "info");
 
-  try {
-    // Step 1: Sign up with Supabase Auth
-    const { data: authData, error: authError } = await db.auth.signUp({
+    const { data, error } = await db.auth.signUp({
       email,
       password,
       options: {
-        data: {
-          username: username
-        },
-        emailRedirectTo: "https://homedoctor-ai-iota.vercel.app/dashboard.html"
+        emailRedirectTo: "https://homedoctor-ai-iota.vercel.app/login.html"
       }
     });
 
-    if (authError) {
-      console.error("Auth error:", authError);
-      return showToast(`Signup failed: ${authError.message}`, "error");
+    if (error) {
+      return showToast(`Signup failed: ${error.message}`, "error");
     }
 
-    if (!authData?.user) {
-      return showToast("Signup failed: No user created", "error");
-    }
-
-    console.log("User created with ID:", authData.user.id);
-
-    // Step 2: Wait for auth to settle
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Step 3: Insert into profiles table
-    console.log("Attempting to create profile for user:", authData.user.id);
-    
-    const { data: profileData, error: profileError } = await db
-      .from("profiles")
-      .insert({
-        id: authData.user.id,
-        username: username,
-        coins: 60,
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (profileError) {
-      console.error("Profile error:", profileError);
-      
-      // Check if it's a duplicate key error (user already has profile)
-      if (profileError.code === '23505') {
-        showToast("Account already exists with this email", "error");
-      } else {
-        showToast(`Profile creation failed: ${profileError.message}`, "error");
+    // Create profile
+    if (data?.user) {
+      const { error: insertError } = await db.from("profiles").upsert([
+        {
+          id: data.user.id,
+          username,
+          created_at: new Date().toISOString()
+        }
+      ]);
+      if (insertError) {
+        console.error("Profile insert error:", insertError);
       }
-      return;
     }
 
-    console.log("Profile created successfully:", profileData);
-    showToast("Signup successful! ✅", "success");
-    
-    // If we have an active session (email confirmation disabled), redirect
-    if (authData?.session) {
-      showToast("Redirecting to dashboard...", "info");
-      setTimeout(() => {
-        window.location.href = "dashboard.html";
-      }, 1500);
-    } else {
-      showToast("Please check your email to confirm your account 📧", "success", 4000);
-    }
-    
-  } catch (err) {
-    console.error("Unexpected signup error:", err);
-    showToast(`Error: ${err.message}`, "error");
-  }
-});
+    showToast("Signup successful! Check your email 📧", "success");
+  });
 
   // 🔐 LOGIN HANDLER
   document.getElementById("loginBtn").addEventListener("click", async () => {
@@ -409,6 +372,18 @@ document.getElementById("signupBtn").addEventListener("click", async () => {
     });
   });
 </script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(() => console.log("Service Worker registered ✅"))
+        .catch(err => console.log("SW registration failed:", err));
+    });
+  }
+</script>
+
 
 
 </body>
