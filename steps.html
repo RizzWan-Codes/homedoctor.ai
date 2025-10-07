@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How to Sign Up - Homedoctor.ai</title>
+  <link rel="icon" href="hello.png">
+  <style>
+    :root {
+      --primary: #1b9c85;
+      --primary-dark: #145c4f;
+      --bg-gradient: linear-gradient(135deg, #e0fff5, #f9fdfb);
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-gradient);
+      margin: 0;
+      padding: 1rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: white;
+      max-width: 800px;
+      width: 100%;
+      border-radius: 18px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      box-sizing: border-box;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--primary-dark);
+      margin-bottom: 1.8rem;
+      font-size: 2rem;
+    }
+
+    .step {
+      margin-bottom: 2.5rem;
+    }
+
+    .step h2 {
+      color: var(--primary);
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .step p {
+      color: #444;
+      margin-bottom: 0.8rem;
+      line-height: 1.6;
+    }
+
+    .step img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      transition: transform 0.2s ease;
+    }
+
+    .step img:hover {
+      transform: scale(1.02);
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.5rem;
+      text-decoration: none;
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 1rem;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* 📱 Mobile tweaks */
+    @media (max-width: 600px) {
+      .container {
+        padding: 1rem;
+        border-radius: 12px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .step h2 {
+        font-size: 1.15rem;
+      }
+
+      .step p {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>How to Sign Up</h1>
+
+    <div class="step">
+      <h2>Step 1: Open the Sign Up Tab</h2>
+      <p>On the login page, tap or click the <strong>Sign Up</strong> tab to switch to the signup form.</p>
+      <img src="2025-10-07-23-20-43.png" alt="Step 1 - Switch to Sign Up Tab">
+    </div>
+
+    <div class="step">
+      <h2>Step 2: Fill in Your Details</h2>
+      <p>Enter your <strong>username</strong>, <strong>email</strong>, and a <strong>password</strong> (minimum 6 characters).</p>
+      <img src="2025-10-07-23-23-20.png" alt="Step 2 - Fill Signup Form">
+    </div>
+
+    <div class="step">
+      <h2>Step 3: Check Your Email 📧</h2>
+      <p>After signing up, check your inbox from "Supabase Auth" for a verification email. Click the link inside to activate your account.</p>
+      <img src="2025-10-07-23-25-19.png" alt="Step 3 - Email Verification">
+    </div>
+
+    <div class="step">
+      <h2>Step 4: Login</h2>
+      <p>Once your email is verified, return to the login page and sign in with your credentials.</p>
+      <img src="2025-10-07-23-27-47.png" alt="Step 4 - Login">
+    </div>
+
+    <div class="step">
+      <h2>Done!</h2>
+      <p>You will be redirected to dashboard. You should see your name on it.</p>
+      <img src="2025-10-07-23-29-43.png" alt="Your Dashboard">
+    </div>
+
+    <a class="back-link" href="login.html">← Back to Login</a>
+  </div>
+</body>
+</html>
