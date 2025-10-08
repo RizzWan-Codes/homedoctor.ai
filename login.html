@@ -2,288 +2,760 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Auth - Homedoctor.ai</title>
-  <link rel="icon" href="hello.png" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#1b9c85" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Homedoctor.ai">
+<link rel="apple-touch-icon" href="hello.png" />
+<link rel="manifest" href="manifest.json" />
+<title>Homedoctor.ai - Your AI Health Companion</title>
+<link rel="icon" href="hello.png" />
   <style>
-    body {
-      background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
+    /* Reset */
+
+    html{
+        scroll-behavior: smooth
+        ;
+    }
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .auth-container {
-      width: 400px;
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      overflow: hidden;
-      position: relative;
+    body {
+      background: #f9fdfb;
+      color: #222;
+      line-height: 1.6;
+      overflow-x: hidden;
     }
 
-    .toggle-tabs {
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem 2rem;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
       display: flex;
-      position: relative;
-      background: #e8f7f4;
-      border-radius: 30px;
-      margin: 1rem auto;
-      width: 90%;
-      height: 45px;
-      cursor: pointer;
-    }
-
-    .toggle-btn {
-      flex: 1;
-      display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
-      z-index: 2;
-      font-weight: bold;
-      color: #145c4f;
+      z-index: 1000;
+    }
+
+    header .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1b9c85;
+    }
+
+    nav {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 500;
       transition: color 0.3s;
     }
 
-    .toggle-btn.active { color: #fff; }
-
-    .toggle-indicator {
-      position: absolute;
-      top: 3px;
-      bottom: 3px;
-      width: 50%;
-      background: #1b9c85;
-      border-radius: 30px;
-      transition: transform 0.3s ease-in-out;
-      z-index: 1;
+    nav a:hover {
+      color: #1b9c85;
     }
 
-    .auth-container.signup-active .toggle-indicator { transform: translateX(100%); }
-
-    .forms {
-      display: flex;
-      width: 200%;
-      transition: transform 0.5s ease;
-    }
-    .auth-container.signup-active .forms { transform: translateX(-50%); }
-
-    .form {
-      width: 50%;
-      padding: 2rem;
-      box-sizing: border-box;
-    }
-
-    .form h1 {
-      color: #145c4f;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-
-    .form-group { margin-bottom: 1.2rem; }
-    input {
-      width: 100%;
-      padding: 0.8rem;
-      border: 1px solid #cde7e2;
-      border-radius: 10px;
-      outline: none;
-    }
-    input:focus {
-      border-color: #1b9c85;
-      box-shadow: 0 0 6px rgba(27,156,133,0.4);
-    }
-
-    button {
-      width: 100%;
-      padding: 1rem;
-      background: #1b9c85;
-      color: #fff;
-      border: none;
-      border-radius: 12px;
+    .menu-toggle {
+      display: none;
+      font-size: 1.8rem;
       cursor: pointer;
-      margin-top: 0.5rem;
-      font-size: 1rem;
     }
-    button:hover { background: #167b68; }
 
-    .forgot-link {
-      text-align: right;
-      font-size: 0.85rem;
-      margin-top: 0.5rem;
-    }
-    .forgot-link a {
-      color: #1b9c85;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .forgot-link a:hover { text-decoration: underline; }
-
-    .how-link {
-      text-align: center;
-      margin-top: 0.8rem;
-      font-size: 0.9rem;
-    }
-    .how-link a {
-      color: #1b9c85;
-      text-decoration: none;
-      font-weight: 600;
-    }
-    .how-link a:hover { text-decoration: underline; }
-
-    /* Toast */
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 9999;
-    }
-    .toast {
-      backdrop-filter: blur(10px);
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-      padding: 14px 18px;
-      border-radius: 14px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-      font-weight: 500;
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      min-width: 240px;
-      opacity: 0;
-      transform: translateY(-20px);
-      animation: toastSlide 0.4s ease forwards;
-      border-left: 5px solid #fff;
+      justify-content: center;
+      padding: 6rem 2rem 2rem;
+      text-align: center;
     }
-    .toast.info { background: linear-gradient(135deg, #1b9c85, #15997a); }
-    .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
-    .toast.error { background: linear-gradient(135deg, #ef4444, #b91c1c); }
-    @keyframes toastSlide { to { opacity: 1; transform: translateY(0); } }
 
-    @media (max-width: 600px) {
-      .auth-container { width: 90%; }
-      .toast-container {
-        top: auto;
-        bottom: 20px;
-        right: 50%;
-        transform: translateX(50%);
-        width: 90%;
-        max-width: 350px;
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #145c4f;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 1.5rem;
+      color: #444;
+    }
+
+    .hero button {
+      padding: 0.8rem 1.5rem;
+      background: #1b9c85;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .hero button:hover {
+      background: #167b68;
+    }
+
+    /* Features */
+    .features {
+      padding: 4rem 2rem;
+      background: white;
+      text-align: center;
+    }
+
+    .features h2 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+      color: #145c4f;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 15px;
+      padding: 2rem 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    .card h3 {
+      color: #1b9c85;
+      margin-bottom: 1rem;
+    }
+
+    /* About */
+    .about {
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, #e0fff5, #f9fdfb);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .about h2 {
+      font-size: 2rem;
+      color: #145c4f;
+      margin-bottom: 1rem;
+    }
+
+    .about p {
+      max-width: 800px;
+      color: #444;
+      font-size: 1.1rem;
+    }
+
+    /* Footer */
+    footer {
+      padding: 2rem;
+      background: #145c4f;
+      color: white;
+      text-align: center;
+    }
+
+    footer a {
+      color: #aef3e7;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    .credits {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #cfeee8;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      nav {
+        display: none;
+        flex-direction: column;
+        background: white;
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        padding: 1rem;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+      }
+
+      nav.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: block;
       }
     }
+
+    /* Checker Section */
+.checker {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f0fdf8, #ffffff);
+  text-align: center;
+}
+
+.checker h2 {
+  font-size: 2rem;
+  color: #145c4f;
+  margin-bottom: 0.5rem;
+}
+
+.checker .disclaimer {
+  font-size: 0.9rem;
+  color: #d9534f;
+  margin-bottom: 2rem;
+}
+
+.checker-form {
+  max-width: 700px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: #145c4f;
+  margin-bottom: 0.5rem;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #cde7e2;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #1b9c85;
+  box-shadow: 0 0 6px rgba(27, 156, 133, 0.4);
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 1rem;
+  background: #1b9c85;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+  margin-left: 5px;
+}
+
+.submit-btn:hover {
+  background: #167b68;
+}
+
+/* Result Box */
+
+.urgency {
+  font-weight: 600;
+}
+
+.urgency.red {
+  color: #d9534f;
+}
+
+.urgency.yellow {
+  color: #f0ad4e;
+}
+
+.urgency.green {
+  color: #5cb85c;
+}
+
+.result-box {
+  max-width: 700px;
+  margin: 2rem auto 0;
+  background: #f9fdfb;
+  border: 1px solid #cde7e2;
+  border-radius: 15px;
+  padding: 1.5rem;
+  text-align: left;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.result-box h3 {
+  color: #145c4f;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+/* Slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: #cde7e2;
+  outline: none;
+  transition: background 0.3s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1b9c85;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #167b68;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1b9c85;
+  cursor: pointer;
+}
+
+.severity-label {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  color: #145c4f;
+  text-align: right;
+}
+
+.made-by-tag {
+  position: fixed;
+  bottom: 15px;
+  right: 15px;
+  background: #00000082;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  transition: background 0.3s;
+}
+.made-by-tag:hover {
+  background: #000000c8;
+  cursor: pointer;
+}
+
+.login-btn{
+  background-color: #167b68;
+  border-color: #167b68;
+  border-style: solid;
+  border-radius: 15px;
+  padding: 3px;
+  height: 27px;
+  width: 130px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 5px;
+  animation: transition 0.5s ease;
+}
+
+.login-btn:hover {
+  background-color: #126253;
+  border-color: #126253;
+  cursor: pointer;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+
+
+.install-section {
+  background: linear-gradient(135deg, #e0fff5, #f9fdfb);
+  text-align: center;
+  padding: 3rem 1.5rem;
+  margin-top: 2rem;
+  border-top: 1px solid #d1fae5;
+}
+
+.install-section h2 {
+  font-size: 1.8rem;
+  color: #145c4f;
+  margin-bottom: 0.5rem;
+}
+
+.install-section p {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 1.5rem;
+}
+
+/* Reusing the same button styles we made earlier 👇 */
+.install-btn {
+  background: linear-gradient(135deg, #1b9c85, #15997a);
+  color: white;
+  border: none;
+  padding: 0.9rem 1.5rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.install-btn:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #15997a, #12876c);
+}
+
+.install-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
   </style>
 </head>
 <body>
+  <header>
+    <div class="logo">Homedoctor.ai</div>
+    <div class="menu-toggle" id="menu-toggle">☰</div>
+    <nav id="nav">
+      <a href="#features">Features</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#checker">See Your Health</a>
+      <button class="login-btn" onclick="window.location.href='login.html'"><b>Login / Sign Up</b></button>
 
-<div id="toastContainer" class="toast-container"></div>
+    </nav>
+  </header>
 
-<div id="authBox" class="auth-container">
-  <div class="toggle-tabs">
-    <div class="toggle-indicator"></div>
-    <div class="toggle-btn active" id="tabLogin">Login</div>
-    <div class="toggle-btn" id="tabSignup">Sign Up</div>
-  </div>
+  <section class="hero">
+    <div>
+      <h1>Your AI Health Companion</h1>
+      <p>Homedoctor.ai helps you understand your symptoms with AI-driven insights, right from the comfort of your home.</p>
+      <a href="#checker"><button>Get Started</button></a>
+    </div>
+  </section>
 
-  <div class="forms">
-    <!-- Login -->
-    <div class="form">
-      <h1>Login</h1>
-      <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
-      <div class="form-group"><input type="password" id="loginPassword" placeholder="Password" /></div>
-      <button id="loginBtn">Login</button>
-      <div class="forgot-link"><a href="#" id="forgotLink">Forgot Password?</a></div>
+  <section class="features" id="features">
+    <h2>Why Choose Homedoctor.ai?</h2>
+    <div class="feature-grid">
+      <div class="card">
+        <h3>Symptom Checker</h3>
+        <p>Input your symptoms and get instant, AI-powered insights on possible conditions.</p>
+      </div>
+      <div class="card">
+        <h3>Trusted Guidance</h3>
+        <p>Our AI suggests next steps: whether to self-care, see a GP, or seek urgent attention.</p>
+      </div>
+      <div class="card">
+        <h3>Secure & Private</h3>
+        <p>Your data is never shared. Security and privacy are at the core of Homedoctor.ai.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <h2>About Homedoctor.ai</h2>
+    <p>
+      Homedoctor.ai is built to empower individuals to take control of their health by providing AI-assisted
+      insights into their symptoms. While it’s not a replacement for professional medical advice, it helps
+      guide you toward the right care at the right time.
+    </p>
+  </section>
+
+  <section class="checker" id="checker">
+  <h2>AI Symptom Checker</h2>
+  <p class="disclaimer">
+    ⚠️ Not a substitute for professional medical advice.  
+    In emergencies, call local emergency services.
+  </p>
+  <form id="symptomForm" class="checker-form">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" id="name" placeholder="Your name" required />
     </div>
 
-    <!-- Signup -->
-    <div class="form">
-      <h1>Sign Up</h1>
-      <div class="form-group"><input type="text" id="signupUsername" placeholder="Username" /></div>
-      <div class="form-group"><input type="email" id="signupEmail" placeholder="Email" /></div>
-      <div class="form-group"><input type="password" id="signupPassword" placeholder="Password" /></div>
-      <button id="signupBtn">Sign Up</button>
-      <p class="how-link">
-        <a href="steps.html" target="_blank">How to Sign Up?</a>
-      </p>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="age">Age</label>
+        <input type="number" id="age" placeholder="e.g. 25" required />
+      </div>
+      <div class="form-group">
+        <label for="gender">Gender</label>
+        <select id="gender" required>
+          <option value="">Select...</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
     </div>
-  </div>
+
+    <div class="form-group">
+      <label for="symptoms">Symptoms</label>
+      <textarea id="symptoms" placeholder="Describe your symptoms..." required></textarea>
+    </div>
+
+    <div class="form-group">
+  <label for="severity">Severity</label>
+  <input type="range" id="severity" min="1" max="3" step="1" value="1" />
+  <div class="severity-label" id="severity-label">Mild</div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://iklnmtdeqorwvufewddr.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs";
+    <div class="form-group">
+      <label for="description">Additional Details</label>
+      <textarea id="description" placeholder="Any extra details about your health..."></textarea>
+    </div>
 
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <button type="submit" class="submit-btn">Check My Health</button>
+  </form>
 
-function showToast(message, type = "info", duration = 2500) {
-  const container = document.getElementById("toastContainer");
-  const toast = document.createElement("div");
-  toast.className = `toast ${type}`;
-  toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">×</button>`;
-  container.appendChild(toast);
-  setTimeout(() => {
-    toast.style.opacity = "0";
-    toast.style.transform = "translateY(-20px)";
-    setTimeout(() => toast.remove(), 300);
-  }, duration);
-}
+  <div id="result" class="result-box">Your Results:</div>
+</section>
 
-// Toggle tabs
-const authBox = document.getElementById("authBox");
-document.getElementById("tabLogin").onclick = () => authBox.classList.remove("signup-active");
-document.getElementById("tabSignup").onclick = () => authBox.classList.add("signup-active");
+<section class="install-section">
+  <h2>Get the Homedoctor.ai App 🩺</h2>
+  <p>Install our app for quick access and a full-screen experience — no browser needed!</p>
+  <button id="installBtn" class="install-btn">
+    📥 Download Our App
+  </button>
+</section>
 
-// Forgot password
-document.getElementById("forgotLink").addEventListener("click", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("loginEmail").value.trim();
-  if (!email) return showToast("Please enter your email first 📧", "error");
-  showToast("Sending reset link...", "info");
-  const { error } = await db.auth.resetPasswordForEmail(email, {
-    redirectTo: "https://homedoctor-ai-iota.vercel.app/reset-password.html",
-  });
-  if (error) showToast(error.message, "error");
-  else showToast("Password reset email sent ✅", "success", 4000);
-});
+  <div class="made-by-tag">Made By Developer Rizwan</div>
 
-// Signup
-document.getElementById("signupBtn").addEventListener("click", async () => {
-  const username = document.getElementById("signupUsername").value.trim();
-  const email = document.getElementById("signupEmail").value.trim();
-  const password = document.getElementById("signupPassword").value;
-  if (!username || !email || !password) return showToast("All fields are required", "error");
-  if (password.length < 6) return showToast("Password must be at least 6 characters", "error");
-  showToast("Signing up...", "info");
+  <footer id="contact">
+    <p>Contact us at <a href="mailto:info@homedoctor.ai">info@homedoctor.ai</a></p>
+    <div class="credits">Made by Rizwan</div>
+  </footer>
 
-  const { data, error } = await db.auth.signUp({
-    email,
-    password,
-    options: { data: { username } },
+
+
+ <script>
+  const toggle = document.getElementById("menu-toggle");
+  const nav = document.getElementById("nav");
+  toggle.addEventListener("click", () => {
+    nav.classList.toggle("active");
   });
 
-  if (error) return showToast(error.message, "error");
+  const severitySlider = document.getElementById("severity");
+  const severityLabel = document.getElementById("severity-label");
 
-  if (data.user) {
-    await db.from("profiles").upsert({ id: data.user.id, username, coins: 60 });
-    showToast("Signup successful ✅", "success");
+  const severityMap = {
+    1: "Mild",
+    2: "Moderate",
+    3: "Severe"
+  };
+
+  const colorMap = {
+    1: "#5cb85c",
+    2: "#f0ad4e",
+    3: "#d9534f"
+  };
+
+  severitySlider.addEventListener("input", () => {
+    const val = severitySlider.value;
+    severityLabel.textContent = severityMap[val];
+    severityLabel.style.color = colorMap[val];
+  });
+
+  const form = document.getElementById("symptomForm");
+  const resultBox = document.getElementById("result");
+  const submitBtn = document.querySelector(".submit-btn");
+
+  // 🔒 Check if trial already used
+  if (localStorage.getItem("trialUsed") === "true") {
+    submitBtn.disabled = true;
+    submitBtn.style.background = "#ccc";
+    submitBtn.style.cursor = "not-allowed";
+    resultBox.innerHTML = "⚠️ You have already used your free trial. Sign up or login for more.";
   }
-});
 
-// Login
-document.getElementById("loginBtn").addEventListener("click", async () => {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  if (!email || !password) return showToast("Please enter email and password", "error");
-  showToast("Logging in...", "info");
-  const { error } = await db.auth.signInWithPassword({ email, password });
-  if (error) return showToast(error.message, "error");
-  window.location.href = "dashboard.html";
-});
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    // Stop if trial is already used
+    if (localStorage.getItem("trialUsed") === "true") {
+      resultBox.innerHTML = "⚠️ Trial already used. Please sign up for more.";
+      return;
+    }
+
+    const data = {
+      name: document.getElementById("name").value,
+      age: document.getElementById("age").value,
+      gender: document.getElementById("gender").value,
+      symptoms: document.getElementById("symptoms").value,
+      severity: document.getElementById("severity").value,
+      description: document.getElementById("description").value,
+    };
+
+    resultBox.innerHTML = "⏳ Checking your health...";
+
+    try {
+      const res = await fetch("/api/check-health", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const json = await res.json();
+      resultBox.innerHTML = `<h3>AI Insights</h3>`;
+      resultBox.appendChild(formatResponse(json.result));
+
+      // ✅ After first success, lock trial permanently
+      localStorage.setItem("trialUsed", "true");
+      submitBtn.disabled = true;
+      submitBtn.style.background = "#ccc";
+      submitBtn.style.cursor = "not-allowed";
+    } catch (err) {
+      resultBox.innerHTML = "⚠️ Error: Could not fetch results.";
+    }
+  });
+
+  function highlightUrgency(text) {
+    return text
+      .replace(/(Urgency[:\s]*RED|Triage[:\s]*RED)/gi, '<span class="urgency red">$1</span>')
+      .replace(/(Urgency[:\s]*YELLOW|Triage[:\s]*YELLOW)/gi, '<span class="urgency yellow">$1</span>')
+      .replace(/(Urgency[:\s]*GREEN|Triage[:\s]*GREEN)/gi, '<span class="urgency green">$1</span>');
+  }
+
+  function formatResponse(text) {
+    const lines = text.split(/\n+/).map(line => line.trim()).filter(Boolean);
+    const container = document.createElement("div");
+
+    lines.forEach(line => {
+      let clean = line.replace(/^[-*#>\s]+/, "");
+      const isNumbered = /^\d+\./.test(clean);
+      const tag = isNumbered ? "li" : "p";
+
+      const el = document.createElement(tag);
+      el.innerHTML = highlightUrgency(clean);
+
+      container.appendChild(el);
+    });
+
+    return container;
+  }
 </script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(() => console.log("Service Worker registered ✅"))
+        .catch(err => console.log("SW registration failed:", err));
+    });
+  }
+</script>
+
+<script>
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+
+  installBtn.style.display = 'none';
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        console.log('✅ App installed');
+      } else {
+        console.log('❌ Install dismissed');
+      }
+      deferredPrompt = null;
+      installBtn.style.display = 'none';
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    console.log('🎉 PWA installed');
+    installBtn.style.display = 'none';
+  });
+</script>
+
+
+
 </body>
 </html>
 
