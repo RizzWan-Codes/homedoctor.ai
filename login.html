@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Auth - Homedoctor.ai</title>
-  <link rel="icon" href="hello.png">
+  <link rel="icon" href="hello.png" />
   <style>
     body {
       background: linear-gradient(135deg, #d9f9f2, #f9fdfb);
@@ -47,9 +47,7 @@
       transition: color 0.3s;
     }
 
-    .toggle-btn.active {
-      color: #fff;
-    }
+    .toggle-btn.active { color: #fff; }
 
     .toggle-indicator {
       position: absolute;
@@ -62,19 +60,14 @@
       z-index: 1;
     }
 
-    .auth-container.signup-active .toggle-indicator {
-      transform: translateX(100%);
-    }
+    .auth-container.signup-active .toggle-indicator { transform: translateX(100%); }
 
     .forms {
       display: flex;
       width: 200%;
       transition: transform 0.5s ease;
     }
-
-    .auth-container.signup-active .forms {
-      transform: translateX(-50%);
-    }
+    .auth-container.signup-active .forms { transform: translateX(-50%); }
 
     .form {
       width: 50%;
@@ -110,11 +103,36 @@
       border-radius: 12px;
       cursor: pointer;
       margin-top: 0.5rem;
+      font-size: 1rem;
     }
     button:hover { background: #167b68; }
 
-    /* 🌿 Toast Styles */
-.toast-container {
+    .forgot-link {
+      text-align: right;
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+    }
+    .forgot-link a {
+      color: #1b9c85;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .forgot-link a:hover { text-decoration: underline; }
+
+    .how-link {
+      text-align: center;
+      margin-top: 0.8rem;
+      font-size: 0.9rem;
+    }
+    .how-link a {
+      color: #1b9c85;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .how-link a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast-container {
       position: fixed;
       top: 20px;
       right: 20px;
@@ -123,22 +141,8 @@
       gap: 10px;
       z-index: 9999;
     }
-
-    @media (max-width: 600px) {
-      .toast-container {
-        top: auto;
-        bottom: 20px;
-        right: 50%;
-        transform: translateX(50%);
-        width: 90%;
-        max-width: 350px;
-      }
-    }
-
-    /* 🌈 Toast Box */
     .toast {
       backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
       background: rgba(255, 255, 255, 0.15);
       color: #fff;
       padding: 14px 18px;
@@ -154,52 +158,29 @@
       animation: toastSlide 0.4s ease forwards;
       border-left: 5px solid #fff;
     }
+    .toast.info { background: linear-gradient(135deg, #1b9c85, #15997a); }
+    .toast.success { background: linear-gradient(135deg, #22c55e, #16a34a); }
+    .toast.error { background: linear-gradient(135deg, #ef4444, #b91c1c); }
+    @keyframes toastSlide { to { opacity: 1; transform: translateY(0); } }
 
-    .toast.info {
-      background: linear-gradient(135deg, #1b9c85, #15997a);
-      border-left-color: #ffffffcc;
-    }
-
-    .toast.success {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-left-color: #bbf7d0;
-    }
-
-    .toast.error {
-      background: linear-gradient(135deg, #ef4444, #b91c1c);
-      border-left-color: #fecaca;
-    }
-
-    .toast button {
-      background: none;
-      border: none;
-      color: white;
-      cursor: pointer;
-      font-size: 20px;
-      line-height: 1;
-      margin-left: 10px;
-      opacity: 0.8;
-      transition: opacity 0.2s;
-    }
-
-    .toast button:hover {
-      opacity: 1;
-    }
-
-    @keyframes toastSlide {
-      to {
-        opacity: 1;
-        transform: translateY(0);
+    @media (max-width: 600px) {
+      .auth-container { width: 90%; }
+      .toast-container {
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        width: 90%;
+        max-width: 350px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- ✅ Toast Container -->
+
 <div id="toastContainer" class="toast-container"></div>
 
 <div id="authBox" class="auth-container">
-
   <div class="toggle-tabs">
     <div class="toggle-indicator"></div>
     <div class="toggle-btn active" id="tabLogin">Login</div>
@@ -207,215 +188,101 @@
   </div>
 
   <div class="forms">
+    <!-- Login -->
     <div class="form">
       <h1>Login</h1>
-      <div class="form-group">
-        <input type="email" id="loginEmail" placeholder="Email" />
-      </div>
-      <div class="form-group">
-        <input type="password" id="loginPassword" placeholder="Password" />
-      </div>
+      <div class="form-group"><input type="email" id="loginEmail" placeholder="Email" /></div>
+      <div class="form-group"><input type="password" id="loginPassword" placeholder="Password" /></div>
       <button id="loginBtn">Login</button>
+      <div class="forgot-link"><a href="#" id="forgotLink">Forgot Password?</a></div>
     </div>
 
+    <!-- Signup -->
     <div class="form">
       <h1>Sign Up</h1>
-      <div class="form-group">
-        <input type="text" id="signupUsername" placeholder="Username" />
-      </div>
-      <div class="form-group">
-        <input type="email" id="signupEmail" placeholder="Email" />
-      </div>
-      <div class="form-group">
-        <input type="password" id="signupPassword" placeholder="Password" />
-      </div>
+      <div class="form-group"><input type="text" id="signupUsername" placeholder="Username" /></div>
+      <div class="form-group"><input type="email" id="signupEmail" placeholder="Email" /></div>
+      <div class="form-group"><input type="password" id="signupPassword" placeholder="Password" /></div>
       <button id="signupBtn">Sign Up</button>
-      <p style="text-align:center; margin-top:0.8rem; font-size:0.9rem;" !important>
-    <a href="steps.html" target="_blank" style="color:#1b9c85; text-decoration:none; font-weight:600;">
-      How to Sign Up?
-    </a>
-  </p>
+      <p class="how-link">
+        <a href="steps.html" target="_blank">How to Sign Up?</a>
+      </p>
     </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  const authBox = document.getElementById("authBox");
-  const tabLogin = document.getElementById("tabLogin");
-  const tabSignup = document.getElementById("tabSignup");
+const SUPABASE_URL = "https://iklnmtdeqorwvufewddr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs";
 
-  tabLogin.addEventListener("click", () => {
-    authBox.classList.remove("signup-active");
-    tabLogin.classList.add("active");
-    tabSignup.classList.remove("active");
-  });
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  tabSignup.addEventListener("click", () => {
-    authBox.classList.add("signup-active");
-    tabSignup.classList.add("active");
-    tabLogin.classList.remove("active");
-  });
-</script>
-
-<script>
 function showToast(message, type = "info", duration = 2500) {
   const container = document.getElementById("toastContainer");
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
-  toast.innerHTML = `
-    <span>${message}</span>
-    <button onclick="this.parentElement.remove()">×</button>
-  `;
+  toast.innerHTML = `<span>${message}</span><button onclick="this.parentElement.remove()">×</button>`;
   container.appendChild(toast);
-
   setTimeout(() => {
     toast.style.opacity = "0";
     toast.style.transform = "translateY(-20px)";
     setTimeout(() => toast.remove(), 300);
   }, duration);
 }
-</script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = "https://iklnmtdeqorwvufewddr.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrbG5tdGRlcW9yd3Z1ZmV3ZGRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTc5NTUwMTAsImV4cCI6MjA3MzUzMTAxMH0.93u-R49w8F4s3Y4jYYcSc7w-ZS14YGusNEO0uBwNTOs";
+// Toggle tabs
+const authBox = document.getElementById("authBox");
+document.getElementById("tabLogin").onclick = () => authBox.classList.remove("signup-active");
+document.getElementById("tabSignup").onclick = () => authBox.classList.add("signup-active");
 
-  const { createClient } = supabase;
-  const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Forgot password
+document.getElementById("forgotLink").addEventListener("click", async (e) => {
+  e.preventDefault();
+  const email = document.getElementById("loginEmail").value.trim();
+  if (!email) return showToast("Please enter your email first 📧", "error");
+  showToast("Sending reset link...", "info");
+  const { error } = await db.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + "/reset-password.html",
+  });
+  if (error) showToast(error.message, "error");
+  else showToast("Password reset email sent ✅", "success", 4000);
+});
 
-  // 🚀 Auto redirect if logged in
-  (async () => {
-    const { data } = await db.auth.getSession();
-    if (data.session) {
-      window.location.href = "dashboard.html";
-    }
-  })();
-
-// ✍️ ROBUST SIGNUP HANDLER - Ensures profile is created
+// Signup
 document.getElementById("signupBtn").addEventListener("click", async () => {
   const username = document.getElementById("signupUsername").value.trim();
   const email = document.getElementById("signupEmail").value.trim();
   const password = document.getElementById("signupPassword").value;
-
-  if (!username || !email || !password) {
-    return showToast("All fields are required", "error");
-  }
-
-  if (password.length < 6) {
-    return showToast("Password must be at least 6 characters", "error");
-  }
-
+  if (!username || !email || !password) return showToast("All fields are required", "error");
+  if (password.length < 6) return showToast("Password must be at least 6 characters", "error");
   showToast("Signing up...", "info");
 
-  try {
-    // Step 1: Sign up with Supabase Auth
-    const { data: authData, error: authError } = await db.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          username: username
-        },
-        emailRedirectTo: "https://homedoctor-ai-iota.vercel.app/dashboard.html"
-      }
-    });
+  const { data, error } = await db.auth.signUp({
+    email,
+    password,
+    options: { data: { username } },
+  });
 
-    if (authError) {
-      console.error("Auth error:", authError);
-      return showToast(`Signup failed: ${authError.message}`, "error");
-    }
+  if (error) return showToast(error.message, "error");
 
-    if (!authData?.user) {
-      return showToast("Signup failed: No user created", "error");
-    }
-
-    console.log("User created with ID:", authData.user.id);
-
-    // Step 2: Wait for auth to settle
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // Step 3: Insert into profiles table
-    console.log("Attempting to create profile for user:", authData.user.id);
-    
-    const { data: profileData, error: profileError } = await db
-      .from("profiles")
-      .insert({
-        id: authData.user.id,
-        username: username,
-        coins: 60,
-        created_at: new Date().toISOString()
-      })
-      .select()
-      .single();
-
-    if (profileError) {
-      console.error("Profile error:", profileError);
-      
-      // Check if it's a duplicate key error (user already has profile)
-      if (profileError.code === '23505') {
-        showToast("Account already exists with this email", "error");
-      } else {
-        showToast(`Profile creation failed: ${profileError.message}`, "error");
-      }
-      return;
-    }
-
-    console.log("Profile created successfully:", profileData);
-    showToast("Signup successful! ✅", "success");
-    
-    // If we have an active session (email confirmation disabled), redirect
-    if (authData?.session) {
-      showToast("Redirecting to dashboard...", "info");
-      setTimeout(() => {
-        window.location.href = "dashboard.html";
-      }, 1500);
-    } else {
-      showToast("Please check your email to confirm your account 📧", "success", 4000);
-    }
-    
-  } catch (err) {
-    console.error("Unexpected signup error:", err);
-    showToast(`Error: ${err.message}`, "error");
+  if (data.user) {
+    await db.from("profiles").upsert({ id: data.user.id, username, coins: 60 });
+    showToast("Signup successful ✅", "success");
   }
 });
 
-  // 🔐 LOGIN HANDLER
-  document.getElementById("loginBtn").addEventListener("click", async () => {
-    const email = document.getElementById("loginEmail").value.trim();
-    const password = document.getElementById("loginPassword").value;
-
-    if (!email || !password) {
-      return showToast("Please enter email and password", "error");
-    }
-
-    showToast("Logging in...", "info");
-
-    const { data, error } = await db.auth.signInWithPassword({ email, password });
-    if (error) {
-      return showToast(`Login failed: ${error.message}`, "error");
-    }
-
-    showToast("Login successful ✅", "success");
-    setTimeout(() => window.location.href = "dashboard.html", 800);
-  });
-
-  // ⌨️ Enter key support
-  document.querySelectorAll("input").forEach(input => {
-    input.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        if (document.getElementById("authBox").classList.contains("signup-active")) {
-          document.getElementById("signupBtn").click();
-        } else {
-          document.getElementById("loginBtn").click();
-        }
-      }
-    });
-  });
+// Login
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const email = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  if (!email || !password) return showToast("Please enter email and password", "error");
+  showToast("Logging in...", "info");
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  if (error) return showToast(error.message, "error");
+  window.location.href = "dashboard.html";
+});
 </script>
-
-
 </body>
-
 </html>
