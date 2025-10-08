@@ -244,7 +244,7 @@ document.getElementById("forgotLink").addEventListener("click", async (e) => {
   if (!email) return showToast("Please enter your email first 📧", "error");
   showToast("Sending reset link...", "info");
   const { error } = await db.auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "https://homedoctor-ai-iota.vercel.app/reset-password.html",
+    redirectTo: "https://homedoctor-ai-iota.vercel.app/reset-password.html",
   });
   if (error) showToast(error.message, "error");
   else showToast("Password reset email sent ✅", "success", 4000);
