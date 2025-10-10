@@ -32,8 +32,8 @@ export default async function handler(req, res) {
 
     1. 📈 Health Trend: Is their health improving, worsening, or stable? Explain briefly.
     2. 🥦 Nutrition Goals: Specify recommended daily nutrient goals based on their symptoms (e.g. protein, carbs, fats).
-    3. 📝 Diet Plan: Suggest a simple daily diet plan to meet those goals.
-    4. 👨‍🍳 Recipes: Give 2 healthy, easy recipes that meet their nutrition goals. Include ingredients, steps, and approximate macros.
+    3. 📝 Diet Plan: Suggest a simple daily diet plan to meet those goals, vegetarian and non-vegetarian options both.
+    4. 👨‍🍳 Recipes: Give 2 healthy, easy recipes that meet their nutrition goals. Include ingredients, steps, and approximate macros and give veg and non-veg version of the same recipie.
     5. 🏋️ Exercise Plan: Recommend a basic exercise plan (e.g. type, frequency, duration).
     6. 💡 Health Tips: Practical lifestyle tips to maintain or improve their condition.
 
@@ -49,7 +49,7 @@ export default async function handler(req, res) {
         { role: "system", content: "You are a helpful health trend assistant." },
         { role: "user", content: prompt },
       ],
-      max_tokens: 600,
+      max_tokens: 650,
     });
 
     const message = completion.choices[0].message.content;
@@ -60,4 +60,5 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Failed to analyze health trend" });
   }
 }
+
 
