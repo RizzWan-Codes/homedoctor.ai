@@ -446,7 +446,7 @@ input[type="range"]::-moz-range-thumb {
   z-index: 99999;
   animation: fadeIn 0.8s ease forwards;
   padding: 1rem;
-  overflow-y: auto; /* 👈 allows scrolling if content too tall */
+  overflow-y: auto;
 }
 
 .ad-content {
@@ -455,8 +455,8 @@ input[type="range"]::-moz-range-thumb {
   padding: 2rem;
   width: 100%;
   max-width: 750px;
-  max-height: 90vh; /* 👈 keeps it inside screen */
-  overflow-y: auto; /* 👈 scroll inside the ad box if needed */
+  max-height: 90vh;
+  overflow-y: auto;
   text-align: center;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   position: relative;
@@ -473,7 +473,7 @@ input[type="range"]::-moz-range-thumb {
   margin-bottom: 1rem;
 }
 
-h1 {
+.ad-content h1 {
   color: #145c4f;
   font-size: 1.9rem;
   margin-bottom: 0.5rem;
@@ -638,7 +638,7 @@ h1 {
     height: 80px;
   }
 
-  h1 {
+  .ad-content h1 {
     font-size: 1.5rem;
   }
 
@@ -759,7 +759,7 @@ h1 {
     <h2>About Homedoctor.ai</h2>
     <p>
       Homedoctor.ai is built to empower individuals to take control of their health by providing AI-assisted
-      insights into their symptoms. While it’s not a replacement for professional medical advice, it helps
+      insights into their symptoms. While it's not a replacement for professional medical advice, it helps
       guide you toward the right care at the right time.
     </p>
   </section>
@@ -856,19 +856,13 @@ h1 {
   const resultBox = document.getElementById("result");
   const submitBtn = document.querySelector(".submit-btn");
 
-  // 🔒 Check if trial already used
-  if (localStorage.getItem("trialUsed") === "true") {
-    submitBtn.disabled = true;
-    submitBtn.style.background = "#ccc";
-    submitBtn.style.cursor = "not-allowed";
-    resultBox.innerHTML = "⚠️ You have already used your free trial. Sign up or login for more.";
-  }
+  const trialData = {};
+  let trialUsed = false;
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Stop if trial is already used
-    if (localStorage.getItem("trialUsed") === "true") {
+    if (trialUsed) {
       resultBox.innerHTML = "⚠️ Trial already used. Please sign up for more.";
       return;
     }
@@ -895,8 +889,7 @@ h1 {
       resultBox.innerHTML = `<h3>AI Insights</h3>`;
       resultBox.appendChild(formatResponse(json.result));
 
-      // ✅ After first success, lock trial permanently
-      localStorage.setItem("trialUsed", "true");
+      trialUsed = true;
       submitBtn.disabled = true;
       submitBtn.style.background = "#ccc";
       submitBtn.style.cursor = "not-allowed";
@@ -937,8 +930,8 @@ h1 {
   const skipBtn = document.getElementById("skipBtn");
 
   let timePassed = 0;
-  const totalTime = 8; // seconds till auto-close
-  const skipTime = 5;  // seconds before "Skip Ad" appears
+  const totalTime = 8;
+  const skipTime = 5;
 
   const timer = setInterval(() => {
     timePassed++;
@@ -961,4 +954,3 @@ h1 {
 
 </body>
 </html>
-
