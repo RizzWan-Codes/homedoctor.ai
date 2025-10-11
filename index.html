@@ -544,93 +544,34 @@ input[type="range"]::-moz-range-thumb {
   color: #444;
 }
 
-/* CTA */
-.cta-btn {
-  background: #1b9c85;
-  color: white;
-  padding: 0.8rem 1.5rem;
-  border: none;
-  border-radius: 30px;
-  font-size: 1rem;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: all 0.3s ease;
+.ad-section {
+  background: linear-gradient(135deg, #b0f2e8, #d7fbe8);
+  padding: 4rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
-.cta-btn:hover {
-  background: #167b68;
-  transform: scale(1.05);
-}
-
-/* Progress + Skip */
-.progress-bar {
+.ad-content {
+  background: #ffffff;
+  border-radius: 25px;
+  padding: 2rem;
   width: 100%;
-  height: 7px;
-  background: #e0f7f2;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-top: 1rem;
+  max-width: 750px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
 }
 
-.progress-fill {
-  width: 0%;
-  height: 100%;
-  background: linear-gradient(90deg, #1b9c85, #13c1a0);
-  transition: width 0.2s ease;
-}
-
-.skip-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #1b9c85;
-  color: white;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 15px;
-  cursor: pointer;
-  font-weight: 600;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.skip-btn.show {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-/* Footer */
 .ad-footer {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: #ffffff;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #145c4f;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(1.05); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes popIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-out {
-  animation: fadeOut 0.7s ease forwards;
-}
-
-@keyframes fadeOut {
-  to { opacity: 0; visibility: hidden; }
-}
-
-/* 🪄 Mobile Fixes */
+/* Mobile adjustments */
 @media (max-width: 600px) {
   .ad-content {
-    padding: 1rem;
-    max-height: 95vh;
+    padding: 1.2rem;
   }
 
   .ad-photo {
@@ -641,81 +582,31 @@ input[type="range"]::-moz-range-thumb {
   .ad-content h1 {
     font-size: 1.5rem;
   }
+}
 
-  .subtext {
-    font-size: 0.9rem;
-  }
+.cta-btn {
+  background: #1b9c85;
+  color: #fff;
+  padding: 0.9rem 1.7rem;
+  border: none;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(27, 156, 133, 0.2);
+}
 
-  .feature-showcase h2 {
-    font-size: 1rem;
-  }
-
-  .feature-showcase li {
-    font-size: 0.9rem;
-  }
-
-  .compare-section {
-    flex-direction: column;
-  }
-
-  .cta-btn {
-    width: 100%;
-    margin-top: 12px;
-  }
+.cta-btn:hover {
+  background: #167b68;
+  transform: scale(1.07);
+  box-shadow: 0 6px 20px rgba(22, 123, 104, 0.35);
 }
 
   </style>
 </head>
 <body>
-  <!-- Advertisement Overlay -->
-<!-- 🌟 Advertisement Intro Section -->
-<div class="ad-overlay" id="adOverlay">
-  <div class="ad-content">
-    <img src="hello.png" alt="Rizwan" class="ad-photo" />
 
-    <h1>🚀 Welcome to <span class="highlight">HomeDoctor.ai</span></h1>
-    <p class="subtext">
-      Celebrating <b>Science Exhibition 2025</b> 🎉<br>
-      Enjoy <span class="highlight">60% OFF</span> on all websites — this week only!
-    </p>
-
-    <div class="feature-showcase">
-      <h2>✨ What Our AI Can Do:</h2>
-      <ul>
-        <li>🤖 AI Symptom Analysis</li>
-        <li>📊 Health Graphs & Logs</li>
-        <li>📅 Health Trends & Insights</li>
-        <li>🧠 Smart Recommendations</li>
-        <li>💳 Secure Auth + Payment System</li>
-      </ul>
-    </div>
-
-    <div class="compare-section">
-      <div class="compare-box">
-        <h3>🩺 Before Homedoctor.ai</h3>
-        <p>Manual health checks, guessing symptoms, no guidance, zero tracking.</p>
-      </div>
-      <div class="compare-box">
-        <h3>⚡ After Homedoctor.ai</h3>
-        <p>Instant AI diagnosis, clear steps, insights, and personalized plans.</p>
-      </div>
-    </div>
-
-    <div class="compare-box">
-        <h3>Want Websites Like These?</h3>
-        <p>Pure Dynamic Websites, Clean And Modern UI/UX, Payment Gateway and a lot more...</p>
-      </div>
-
-    <button class="cta-btn" onclick="window.open('https://sonicinfotech.com', '_blank')">
-      🌐 Get Your Own Website
-    </button>
-
-    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <button class="skip-btn" id="skipBtn">Skip Ad ✖</button>
-
-    <footer class="ad-footer">Made by <b>Rizwan</b> (Grade 7) • Powered by Innovation 💡</footer>
-  </div>
-</div>
 
   <header>
     <div class="logo">Homedoctor.ai</div>
@@ -734,6 +625,53 @@ input[type="range"]::-moz-range-thumb {
       <h1>Your AI Health Companion</h1>
       <p>Homedoctor.ai helps you understand your symptoms with AI-driven insights, right from the comfort of your home.</p>
       <a href="#checker"><button>Get Started</button></a>
+    </div>
+  </section>
+
+   <section class="ad-section" id="adSection">
+    <div class="ad-content">
+      <img src="hello.png" alt="Rizwan" class="ad-photo" />
+
+      <h1>🚀 Welcome to <span class="highlight">HomeDoctor.ai</span></h1>
+      <p class="subtext">
+        Celebrating <b>Science Exhibition 2025</b> 🎉<br>
+        Enjoy <span class="highlight">60% OFF</span> on all websites — this week only!
+      </p>
+
+      <div class="feature-showcase">
+        <h2>✨ What Our AI Can Do:</h2>
+        <ul>
+          <li>🤖 AI Symptom Analysis</li>
+          <li>📊 Health Graphs & Logs</li>
+          <li>📅 Health Trends & Insights</li>
+          <li>🧠 Smart Recommendations</li>
+          <li>💳 Secure Auth + Payment System</li>
+        </ul>
+      </div>
+
+      <div class="compare-section">
+        <div class="compare-box">
+          <h3>🩺 Before Homedoctor.ai</h3>
+          <p>Manual health checks, guessing symptoms, no guidance, zero tracking.</p>
+        </div>
+        <div class="compare-box">
+          <h3>⚡ After Homedoctor.ai</h3>
+          <p>Instant AI diagnosis, clear steps, insights, and personalized plans.</p>
+        </div>
+      </div>
+
+      <div class="compare-box" style="margin-bottom: 20px;">
+        <h3>Want Websites Like These?</h3>
+        <p>Pure Dynamic Websites, Clean And Modern UI/UX, Payment Gateway and a lot more...</p>
+      </div>
+
+      <button class="cta-btn" onclick="window.open('https://sonicinfotech.com', '_blank')">
+        🌐 Get Your Own Website
+      </button>
+
+      <footer class="ad-footer" style="color: white; margin-top: 32px;">
+        Made by <b>Rizwan</b> (Grade 7) • Powered by Innovation 💡
+      </footer>
     </div>
   </section>
 
