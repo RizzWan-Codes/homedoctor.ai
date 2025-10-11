@@ -5,15 +5,9 @@
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#1b9c85" />
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Homedoctor.ai">
-<link rel="apple-touch-icon" href="hello.png" />
-<link rel="manifest" href="manifest.json" />
-<title>Dashboard - Homedoctor.ai</title>
-<link rel="icon" href="hello.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Homedoctor.ai</title>
+  <link rel="icon" href="hello.png">
   <style>
     html{scroll-behavior: smooth;}
     *{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif}
@@ -642,7 +636,7 @@ document.getElementById("btn-trend")?.addEventListener("click", async () => {
 
       // 🧾 Launch Razorpay
       const options = {
-        key: "rzp_live_RJofyRfetD0Gdz",
+        key: "rzp_live_RSFyBRpbGTr2uo",
         amount: orderData.order.amount,
         currency: "INR",
         name: "Homedoctor.ai",
@@ -722,18 +716,6 @@ function showCoinPopup(text) {
 
 });
 </script>
-
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./service-worker.js")
-        .then(() => console.log("Service Worker registered ✅"))
-        .catch(err => console.log("SW registration failed:", err));
-    });
-  }
-</script>
-
 
 </body>
 </html>
