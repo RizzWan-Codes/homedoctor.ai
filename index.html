@@ -2,15 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="theme-color" content="#1b9c85" />
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Homedoctor.ai">
-<link rel="apple-touch-icon" href="hello.png" />
-<link rel="manifest" href="manifest.json" />
-<title>Homedoctor.ai - Your AI Health Companion</title>
-<link rel="icon" href="hello.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homedoctor.ai - Your AI Health Companion</title>
+  <link rel="icon" href="hello.png">
   <style>
     /* Reset */
 
@@ -422,7 +416,7 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 15px;
   padding: 3px;
   height: 27px;
-  width: 130px;
+  width: 110px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -439,54 +433,290 @@ input[type="range"]::-moz-range-thumb {
   transform: scale(1.05);
 }
 
-.install-section {
-  background: linear-gradient(135deg, #e0fff5, #f9fdfb);
-  text-align: center;
-  padding: 3rem 1.5rem;
-  margin-top: 2rem;
-  border-top: 1px solid #d1fae5;
+/* 🌟 Advertisement Styles */
+.ad-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #b0f2e8, #d7fbe8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  animation: fadeIn 0.8s ease forwards;
+  padding: 1rem;
+  overflow-y: auto; /* 👈 allows scrolling if content too tall */
 }
 
-.install-section h2 {
-  font-size: 1.8rem;
+.ad-content {
+  background: #ffffff;
+  border-radius: 25px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 750px;
+  max-height: 90vh; /* 👈 keeps it inside screen */
+  overflow-y: auto; /* 👈 scroll inside the ad box if needed */
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: popIn 0.8s ease;
+}
+
+.ad-photo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #1b9c85;
+  box-shadow: 0 0 15px rgba(27, 156, 133, 0.4);
+  margin-bottom: 1rem;
+}
+
+h1 {
   color: #145c4f;
+  font-size: 1.9rem;
   margin-bottom: 0.5rem;
 }
 
-.install-section p {
+.subtext {
   font-size: 1rem;
-  color: #444;
-  margin-bottom: 1.5rem;
+  color: #333;
+  margin-bottom: 1.3rem;
 }
 
-/* Reusing the same button styles we made earlier 👇 */
-.install-btn {
-  background: linear-gradient(135deg, #1b9c85, #15997a);
+.highlight {
+  color: #1b9c85;
+  font-weight: 700;
+}
+
+/* Features */
+.feature-showcase {
+  text-align: left;
+  background: #f0fdf8;
+  border-radius: 15px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.feature-showcase h2 {
+  color: #145c4f;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.feature-showcase ul {
+  list-style: none;
+  padding-left: 1rem;
+}
+
+.feature-showcase li {
+  padding: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Comparison Section */
+.compare-section {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.compare-box {
+  flex: 1;
+  min-width: 250px;
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 0.9rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.compare-box h3 {
+  color: #1b9c85;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+}
+
+.compare-box p {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+/* CTA */
+.cta-btn {
+  background: #1b9c85;
   color: white;
+  padding: 0.8rem 1.5rem;
   border: none;
-  padding: 0.9rem 1.5rem;
   border-radius: 30px;
   font-size: 1rem;
-  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease, background 0.3s ease;
+  margin-top: 0.5rem;
+  transition: all 0.3s ease;
 }
 
-.install-btn:hover {
+.cta-btn:hover {
+  background: #167b68;
   transform: scale(1.05);
-  background: linear-gradient(135deg, #15997a, #12876c);
 }
 
-.install-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Progress + Skip */
+.progress-bar {
+  width: 100%;
+  height: 7px;
+  background: #e0f7f2;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-top: 1rem;
 }
 
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #1b9c85, #13c1a0);
+  transition: width 0.2s ease;
+}
+
+.skip-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #1b9c85;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.skip-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Footer */
+.ad-footer {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-out {
+  animation: fadeOut 0.7s ease forwards;
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; visibility: hidden; }
+}
+
+/* 🪄 Mobile Fixes */
+@media (max-width: 600px) {
+  .ad-content {
+    padding: 1rem;
+    max-height: 95vh;
+  }
+
+  .ad-photo {
+    width: 80px;
+    height: 80px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .subtext {
+    font-size: 0.9rem;
+  }
+
+  .feature-showcase h2 {
+    font-size: 1rem;
+  }
+
+  .feature-showcase li {
+    font-size: 0.9rem;
+  }
+
+  .compare-section {
+    flex-direction: column;
+  }
+
+  .cta-btn {
+    width: 100%;
+    margin-top: 12px;
+  }
+}
 
   </style>
 </head>
 <body>
+  <!-- Advertisement Overlay -->
+<!-- 🌟 Advertisement Intro Section -->
+<div class="ad-overlay" id="adOverlay">
+  <div class="ad-content">
+    <img src="hello.png" alt="Rizwan" class="ad-photo" />
+
+    <h1>🚀 Welcome to <span class="highlight">HomeDoctor.ai</span></h1>
+    <p class="subtext">
+      Celebrating <b>Science Exhibition 2025</b> 🎉<br>
+      Enjoy <span class="highlight">60% OFF</span> on all websites — this week only!
+    </p>
+
+    <div class="feature-showcase">
+      <h2>✨ What Our AI Can Do:</h2>
+      <ul>
+        <li>🤖 AI Symptom Analysis</li>
+        <li>📊 Health Graphs & Logs</li>
+        <li>📅 Health Trends & Insights</li>
+        <li>🧠 Smart Recommendations</li>
+        <li>💳 Secure Auth + Payment System</li>
+      </ul>
+    </div>
+
+    <div class="compare-section">
+      <div class="compare-box">
+        <h3>🩺 Before Homedoctor.ai</h3>
+        <p>Manual health checks, guessing symptoms, no guidance, zero tracking.</p>
+      </div>
+      <div class="compare-box">
+        <h3>⚡ After Homedoctor.ai</h3>
+        <p>Instant AI diagnosis, clear steps, insights, and personalized plans.</p>
+      </div>
+    </div>
+
+    <div class="compare-box">
+        <h3>Want Websites Like These?</h3>
+        <p>Pure Dynamic Websites, Clean And Modern UI/UX, Payment Gateway and a lot more...</p>
+      </div>
+
+    <button class="cta-btn" onclick="window.open('https://sonicinfotech.com', '_blank')">
+      🌐 Get Your Own Website
+    </button>
+
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <button class="skip-btn" id="skipBtn">Skip Ad ✖</button>
+
+    <footer class="ad-footer">Made by <b>Rizwan</b> (Grade 7) • Powered by Innovation 💡</footer>
+  </div>
+</div>
+
   <header>
     <div class="logo">Homedoctor.ai</div>
     <div class="menu-toggle" id="menu-toggle">☰</div>
@@ -496,7 +726,6 @@ input[type="range"]::-moz-range-thumb {
       <a href="#contact">Contact</a>
       <a href="#checker">See Your Health</a>
       <button class="login-btn" onclick="window.open('login.html','_blank')"><b>Login / Sign Up</b></button>
-
     </nav>
   </header>
 
@@ -550,7 +779,7 @@ input[type="range"]::-moz-range-thumb {
     <div class="form-row">
       <div class="form-group">
         <label for="age">Age</label>
-        <input type="number" id="age" placeholder="e.g. 25" min="3" max="120" required />
+        <input type="number" id="age" placeholder="e.g. 25" required />
       </div>
       <div class="form-group">
         <label for="gender">Gender</label>
@@ -585,13 +814,6 @@ input[type="range"]::-moz-range-thumb {
   <div id="result" class="result-box">Your Results:</div>
 </section>
 
-<section class="install-section">
-  <h2>Get the Homedoctor.ai App 🩺</h2>
-  <p>Install our app for quick access and a full-screen experience — no browser needed!</p>
-  <button id="installBtn" class="install-btn">
-    📥 Download Our App
-  </button>
-</section>
 
   <div class="made-by-tag">Made By Developer Rizwan</div>
 
@@ -710,53 +932,33 @@ input[type="range"]::-moz-range-thumb {
 </script>
 
 <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./service-worker.js")
-        .then(() => console.log("Service Worker registered ✅"))
-        .catch(err => console.log("SW registration failed:", err));
-    });
+  const adOverlay = document.getElementById("adOverlay");
+  const progressFill = document.getElementById("progressFill");
+  const skipBtn = document.getElementById("skipBtn");
+
+  let timePassed = 0;
+  const totalTime = 8; // seconds till auto-close
+  const skipTime = 5;  // seconds before "Skip Ad" appears
+
+  const timer = setInterval(() => {
+    timePassed++;
+    progressFill.style.width = `${(timePassed / totalTime) * 100}%`;
+
+    if (timePassed >= skipTime) skipBtn.classList.add("show");
+    if (timePassed >= totalTime) closeAd();
+  }, 1000);
+
+  skipBtn.addEventListener("click", closeAd);
+
+  function closeAd() {
+    clearInterval(timer);
+    adOverlay.classList.add("fade-out");
+    setTimeout(() => adOverlay.remove(), 700);
   }
-</script>
-
-<script>
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
-
-  installBtn.style.display = 'none';
-
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
-  });
-
-  installBtn.addEventListener('click', async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        console.log('✅ App installed');
-      } else {
-        console.log('❌ Install dismissed');
-      }
-      deferredPrompt = null;
-      installBtn.style.display = 'none';
-    }
-  });
-
-  window.addEventListener('appinstalled', () => {
-    console.log('🎉 PWA installed');
-    installBtn.style.display = 'none';
-  });
 </script>
 
 
 
 </body>
 </html>
-
-
-
 
